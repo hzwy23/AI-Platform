@@ -44,7 +44,6 @@ func (r *Context) GetMessage() *protocol.Message {
 	return r.message
 }
 
-func (r *Context) Send(msg *protocol.Message) (int, error) {
-	msgByte := protocol.ConvertToByte(msg)
-	return r.protoService.Send(msgByte)
+func (r *Context) Send(msgId uint16, msgData []byte) (int, error) {
+	return r.protoService.Send(msgId, msgData)
 }

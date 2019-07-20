@@ -10,6 +10,21 @@ import (
 	"time"
 )
 
+// 数据解析
+// 1. 转义处理
+// 2. 长度校验
+// 3. 解密body部分
+// 4. CRC校验body部分
+
+// 封装数据
+// 1. 生成数据body
+// 2. CRC校验Body部分，生成CRC校验码，并设置到报文相关字段CrcCode
+// 3. 加密body部分
+// 4. 统计报文长度，并设置Header中报文长度相关字段MsgLength
+// 4. 转义处理
+// 5. 发送数据
+
+
 func NewJTTProtocol(conn net.Conn) *JTTProtocol {
 	r := &JTTProtocol{
 		buffer:    make([]byte, 0),
@@ -34,8 +49,8 @@ type JTTProtocol struct {
 }
 
 // 发送数据
-func (r *JTTProtocol) Send(data []byte) (int, error) {
-	return r.conn.Write(data)
+func (r *JTTProtocol) Send(msgId uint16, msgData []byte) (int, error) {
+	return r.conn.Write(Pack(msgId, msgData))
 }
 
 // 读取数据
@@ -50,6 +65,58 @@ func (r *JTTProtocol) Parse() ([]byte, error) {
 		return nil, errors.New("连接已经断开")
 	}
 	return nil, nil
+}
+
+func UnPack(msgData []byte) ([]byte,error) {
+	// 转义
+	realMsg := escapse(msgData)
+	// 检查长度
+	size, flag := check(realMsg)
+	// 解密
+	realMsg = decrypt(realMsg,size)
+	if flag {
+		// CRC校验
+		if crc(realMsg,size) {
+			return realMsg, nil
+		} else {
+			return nil, errors.New("CRC校验失败")
+		}
+	} else {
+		return nil, errors.New("报文长度校验失败")
+	}
+}
+
+// 封包
+func Pack(msgID uint16, body []byte) []byte {
+	header := Header{
+		MsgLength:   0,
+		MsgSN:       1,
+		MsgID:       msgID,
+		MsgCenterID: 1,
+		VersionFlag: [3]byte{0x01, 0x01, 0x01},
+		EncryptFlag: 0x01,
+		EncryptKey:  KEY,
+	}
+	crc, _ := CRC16CCITT(body)
+
+	encryptBody := Encrypt(KEY, body)
+
+	message := &Message{
+		HeaderFlag: HEADER_FLAG,
+		MsgHeader:  header,
+		MsgBody:    encryptBody,
+		CrcCode:    crc,
+		FooterFlag: FOOTER_FLAG,
+	}
+
+	data := ConvertToByte(message)
+	msgLen := len(data)
+	// 修改报文长度字段
+	_ = binary.Write(bytes.NewBuffer(data[1:5]), binary.BigEndian, msgLen)
+
+	msgData := escapse(data)
+
+	return msgData
 }
 
 func (r *JTTProtocol) read() {
@@ -82,6 +149,7 @@ func (r *JTTProtocol) parse() ([]byte, bool) {
 	tmp := r.buffer
 	r.buffer = make([]byte, 0)
 	r.lock.RUnlock()
+
 	for idx, item := range tmp {
 		if item == HEADER_FLAG {
 			r.message = make([]byte, 0)
@@ -97,18 +165,36 @@ func (r *JTTProtocol) parse() ([]byte, bool) {
 			break
 		}
 	}
+
 	// 如果获取到结束符，则处理消息
-	if endFlag && r.check() {
-		return r.escapse(), true
+	if endFlag {
+		// 转义
+		realMsg := escapse(r.message)
+		// 检查长度
+		size, flag := check(realMsg)
+		// 解密
+		realMsg = decrypt(realMsg,size)
+		if flag {
+			// CRC校验
+			if crc(realMsg,size) {
+				return realMsg, true
+			} else {
+				return nil, false
+			}
+		} else {
+			return nil,false
+		}
 	}
 	return nil, false
 }
 
-func (r *JTTProtocol) escapse() []byte {
+
+// 转义处理
+func escapse(msgData []byte) []byte {
 	buf := make([]byte, 0)
-	buf = append(buf, r.message[0])
+	buf = append(buf, msgData[0])
 	escapseCount := 0
-	msg := r.message[1 : len(r.message)-1]
+	msg := msgData[1 : len(msgData)-1]
 	for idx := 0; idx < len(msg); idx++ {
 		item := msg[idx]
 		if item == ESCAPE_HEADER_FLAG && msg[idx+1] == ESCAPE_HEADER_FLAG_APPEND {
@@ -142,23 +228,38 @@ func (r *JTTProtocol) escapse() []byte {
 	return buf
 }
 
-func (r *JTTProtocol) check() bool {
+// 长度校验
+func check(realMsg []byte) (uint32,bool) {
+	// 获取数据包长度
 	var size uint32 = 0
-	sizeVal := r.message[1:5]
+	sizeVal := realMsg[1:5]
 	_ = binary.Read(bytes.NewBuffer(sizeVal), binary.BigEndian, &size)
-	if uint32(len(r.message)) == size {
-		crcCode := uint16(0)
-		_ = binary.Read(bytes.NewBuffer(r.message[size-3:size-1]), binary.BigEndian, &crcCode)
-		crc, _ := CRC16CCITT(r.message[23 : size-3])
-		if crcCode == crc {
-			body := Decrypt(KEY, r.message[23:size-3])
-			copy(r.message[23:size-3], body)
-			return true
-		}
-		logger.Warn("CRC16-CCITT校验失败:", r.message)
-		return false
+
+	if uint32(len(realMsg)) == size {
+		return size, true
 	} else {
-		logger.Info("报文字节字节数不一致。", r.message)
-		return false
+		logger.Info("报文字节字节数不一致。", realMsg)
+		return 0, false
 	}
+}
+
+// CRC 校验
+func crc(realMsg []byte, size uint32) bool {
+	// CRC校验
+	crcCode := uint16(0)
+	_ = binary.Read(bytes.NewBuffer(realMsg[size-3:size-1]), binary.BigEndian, &crcCode)
+	crc, _ := CRC16CCITT(realMsg[23 : size-3])
+
+	if crcCode == crc {
+		return true
+	}
+
+	logger.Warn("CRC16-CCITT校验失败:", realMsg)
+	return false
+}
+
+func decrypt(realMsg []byte, size uint32) []byte {
+	body := Decrypt(KEY, realMsg[23:size-3])
+	copy(realMsg[23:size-3], body)
+	return realMsg
 }

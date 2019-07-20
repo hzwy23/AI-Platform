@@ -7,7 +7,7 @@ import (
 
 func demo(context *platform.Context) {
 	fmt.Println("hello world", context.GetMessage().MsgBody, context.GetMsgId())
-	context.Send(context.GetMessage())
+	context.Send(10, []byte{'h','e','l','l','o'})
 }
 
 func init() {
