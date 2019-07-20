@@ -1,0 +1,18 @@
+package protocol
+
+const (
+	HEADER_FLAG                 = 0x5b
+	ESCAPE_HEADER_FLAG          = 0x5a
+	ESCAPE_HEADER_FLAG_APPEND   = 0x01
+	ALIAS_HEADER_FLAG_5A_APPEND = 0x02
+
+	FOOTER_FLAG                  = 0x5d
+	ESCAPE_FOOTER_FLAG           = 0x5e
+	ESCAPE_FOOTER_FLAG_APPEND    = 0x01
+	ESCAPE_FOOTER_FLAG_5E_APPEND = 0x02
+
+	KEY     = uint32(888666)
+	KEY_MI  = uint32(987654321)
+	KEY_IAI = uint32(123456789)
+	KEY_ICI = uint32(135792468)
+)
