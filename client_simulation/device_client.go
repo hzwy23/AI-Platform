@@ -83,7 +83,7 @@ func main() {
 		logger.Error("连接失败，", err)
 	}
 	defer conn.Close()
-	data := protocol.Pack(12, []byte{'a', 'b', 'c', 'd', 'e', 'f', 'a', 's', 'd', 'f', 'd'})
+	data ,err := protocol.Pack(12, []byte{'a', 'b', 'c', 'd', 'e', 'f', 'a', 's', 'd', 'f', 'd'})
 	fmt.Println(data)
 	go write(conn, data)
 	go read(conn)

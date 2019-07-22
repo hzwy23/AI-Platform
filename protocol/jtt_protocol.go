@@ -50,7 +50,12 @@ type JTTProtocol struct {
 
 // 发送数据
 func (r *JTTProtocol) Send(msgId uint16, msgData []byte) (int, error) {
-	return r.conn.Write(Pack(msgId, msgData))
+	data,err := Pack(msgId, msgData)
+	if err != nil {
+		logger.Warn(err)
+		return 0,err
+	}
+	return r.conn.Write(data)
 }
 
 // 读取数据
@@ -69,7 +74,7 @@ func (r *JTTProtocol) Parse() ([]byte, error) {
 
 func UnPack(msgData []byte) ([]byte,error) {
 	// 转义
-	realMsg := escapse(msgData)
+	realMsg := unpackescapse(msgData)
 	// 检查长度
 	size, flag := check(realMsg)
 	// 解密
@@ -87,7 +92,7 @@ func UnPack(msgData []byte) ([]byte,error) {
 }
 
 // 封包
-func Pack(msgID uint16, body []byte) []byte {
+func Pack(msgID uint16, body []byte) ([]byte, error) {
 	header := Header{
 		MsgLength:   0,
 		MsgSN:       1,
@@ -114,9 +119,9 @@ func Pack(msgID uint16, body []byte) []byte {
 	// 修改报文长度字段
 	_ = binary.Write(bytes.NewBuffer(data[1:5]), binary.BigEndian, msgLen)
 
-	msgData := escapse(data)
+	msgData, err := packEscape(data)
 
-	return msgData
+	return msgData, err
 }
 
 func (r *JTTProtocol) read() {
@@ -169,7 +174,7 @@ func (r *JTTProtocol) parse() ([]byte, bool) {
 	// 如果获取到结束符，则处理消息
 	if endFlag {
 		// 转义
-		realMsg := escapse(r.message)
+		realMsg := unpackescapse(r.message)
 		// 检查长度
 		size, flag := check(realMsg)
 		// 解密
@@ -188,9 +193,33 @@ func (r *JTTProtocol) parse() ([]byte, bool) {
 	return nil, false
 }
 
+func packEscape(msgData []byte) ([]byte,error) {
+	if len(msgData) < 23 {
+		logger.Warn("无效的报文")
+		return nil,errors.New("无效的报文")
+	}
+	buf := make([]byte, 0)
+	buf = append(buf, msgData[0])
+	for _,val := range msgData[1:len(msgData)-1] {
+		if val == HEADER_FLAG {
+			buf = append(buf, ESCAPE_HEADER_FLAG, ESCAPE_HEADER_FLAG_APPEND)
+		} else if val == ESCAPE_HEADER_FLAG {
+			buf = append(buf, ESCAPE_HEADER_FLAG, ALIAS_HEADER_FLAG_5A_APPEND)
+		} else if val == FOOTER_FLAG {
+			buf = append(buf, ESCAPE_FOOTER_FLAG, ESCAPE_FOOTER_FLAG_APPEND)
+		} else if val == ESCAPE_FOOTER_FLAG {
+			buf = append(buf, ESCAPE_FOOTER_FLAG, ESCAPE_FOOTER_FLAG_5E_APPEND)
+		} else {
+			buf = append(buf, val)
+		}
+	}
+	buf = append(buf, FOOTER_FLAG)
+	return buf,nil
+}
+
 
 // 转义处理
-func escapse(msgData []byte) []byte {
+func unpackescapse(msgData []byte) []byte {
 	buf := make([]byte, 0)
 	buf = append(buf, msgData[0])
 	escapseCount := 0

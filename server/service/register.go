@@ -1,8 +1,8 @@
 package service
 
 import (
-	"fmt"
 	"ai-platform/server/platform"
+	"fmt"
 )
 
 func demo(context *platform.Context) {
