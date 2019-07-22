@@ -56,7 +56,9 @@ func read(conn *net.TCPConn) {
 		buf,_ := protocol.UnPack(rbuf[:rsize])
 		msg:= protocol.ConvertMessage(buf)
 
-		fmt.Println("读取到结果是：",msg, string(msg.MsgBody), err)
+		fmt.Println("读取到字节流是：", buf)
+		fmt.Println("读取到对象是：", msg)
+		fmt.Println("数据body是：",string(msg.MsgBody))
 		if err != nil {
 			logger.Error(err)
 			conn, err = reconnect()
@@ -83,7 +85,7 @@ func main() {
 		logger.Error("连接失败，", err)
 	}
 	defer conn.Close()
-	data ,err := protocol.Pack(12, []byte{'a', 'b', 'c', 'd', 'e', 'f', 'a', 's', 'd', 'f', 'd'})
+	data ,err := protocol.Pack(888, []byte{'a', 'b', 'c', 'd', 'e', 'f', 'a', 's', 'd', 'f', 'd'})
 	fmt.Println(data)
 	go write(conn, data)
 	go read(conn)
