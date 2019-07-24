@@ -2,6 +2,7 @@ package platform
 
 import (
 	"ai-platform/panda/logger"
+	"fmt"
 	"sync"
 )
 
@@ -45,4 +46,9 @@ func Register(msgId uint16, handler Handler) {
 
 func dispatcher(context *Context) {
 	defaultBusinessDispatcher.dispatcher(context)
+	go func() {
+		msgId := context.msgId
+		msg := context.message
+		fmt.Println("报文信息是：",msgId, *msg)
+	}()
 }

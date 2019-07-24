@@ -24,7 +24,6 @@ import (
 // 4. 转义处理
 // 5. 发送数据
 
-
 func NewJTTProtocol(conn net.Conn) *JTTProtocol {
 	r := &JTTProtocol{
 		buffer:    make([]byte, 0),
@@ -50,10 +49,10 @@ type JTTProtocol struct {
 
 // 发送数据
 func (r *JTTProtocol) Send(msgId uint16, msgData []byte) (int, error) {
-	data,err := Pack(msgId, msgData)
+	data, err := Pack(msgId, msgData)
 	if err != nil {
 		logger.Warn(err)
-		return 0,err
+		return 0, err
 	}
 	return r.conn.Write(data)
 }
@@ -72,16 +71,16 @@ func (r *JTTProtocol) Parse() ([]byte, error) {
 	return nil, nil
 }
 
-func UnPack(msgData []byte) ([]byte,error) {
+func UnPack(msgData []byte) ([]byte, error) {
 	// 转义
 	realMsg := unpackescapse(msgData)
 	// 检查长度
 	size, flag := check(realMsg)
 	// 解密
-	realMsg = decrypt(realMsg,size)
+	realMsg = decrypt(realMsg, size)
 	if flag {
 		// CRC校验
-		if crc(realMsg,size) {
+		if crc(realMsg, size) {
 			return realMsg, nil
 		} else {
 			return nil, errors.New("CRC校验失败")
@@ -141,6 +140,7 @@ func (r *JTTProtocol) read() {
 		}
 		// 如果解析到message，则触发相应的处理逻辑
 		r.lock.Lock()
+		logger.Debug("receive byte is: ", tmp[:size])
 		r.buffer = append(r.buffer, tmp[:size]...)
 		r.lock.Unlock()
 	}
@@ -178,29 +178,29 @@ func (r *JTTProtocol) parse() ([]byte, bool) {
 		// 检查长度
 		size, flag := check(realMsg)
 		// 解密
-		realMsg = decrypt(realMsg,size)
+		realMsg = decrypt(realMsg, size)
 		if flag {
 			// CRC校验
-			if crc(realMsg,size) {
+			if crc(realMsg, size) {
 				return realMsg, true
 			} else {
 				return nil, false
 			}
 		} else {
-			return nil,false
+			return nil, false
 		}
 	}
 	return nil, false
 }
 
-func packEscape(msgData []byte) ([]byte,error) {
+func packEscape(msgData []byte) ([]byte, error) {
 	if len(msgData) < 23 {
 		logger.Warn("无效的报文")
-		return nil,errors.New("无效的报文")
+		return nil, errors.New("无效的报文")
 	}
 	buf := make([]byte, 0)
 	buf = append(buf, msgData[0])
-	for _,val := range msgData[1:len(msgData)-1] {
+	for _, val := range msgData[1 : len(msgData)-1] {
 		if val == HEADER_FLAG {
 			buf = append(buf, ESCAPE_HEADER_FLAG, ESCAPE_HEADER_FLAG_APPEND)
 		} else if val == ESCAPE_HEADER_FLAG {
@@ -214,12 +214,14 @@ func packEscape(msgData []byte) ([]byte,error) {
 		}
 	}
 	buf = append(buf, FOOTER_FLAG)
-	return buf,nil
+	return buf, nil
 }
-
 
 // 转义处理
 func unpackescapse(msgData []byte) []byte {
+	if len(msgData) == 0 {
+		return nil
+	}
 	buf := make([]byte, 0)
 	buf = append(buf, msgData[0])
 	escapseCount := 0
@@ -258,7 +260,10 @@ func unpackescapse(msgData []byte) []byte {
 }
 
 // 长度校验
-func check(realMsg []byte) (uint32,bool) {
+func check(realMsg []byte) (uint32, bool) {
+	if len(realMsg) < 26 {
+		return 0, false
+	}
 	// 获取数据包长度
 	var size uint32 = 0
 	sizeVal := realMsg[1:5]

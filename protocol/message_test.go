@@ -1,8 +1,8 @@
 package protocol_test
 
 import (
-	"fmt"
 	"ai-platform/protocol"
+	"fmt"
 	"testing"
 	"unsafe"
 )

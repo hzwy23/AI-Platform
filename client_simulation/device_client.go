@@ -1,15 +1,15 @@
 package main
 
 import (
-	"fmt"
-	"ai-platform/protocol"
 	"ai-platform/panda/logger"
+	"ai-platform/protocol"
+	"fmt"
 	"net"
 	"time"
 )
 
 func reconnect() (*net.TCPConn, error) {
-	tcpAddr, err := net.ResolveTCPAddr("tcp", "localhost:8989")
+	tcpAddr, err := net.ResolveTCPAddr("tcp", "118.31.46.174:8989")
 	if err != nil {
 		logger.Error("", err)
 	}
@@ -56,6 +56,7 @@ func read(conn *net.TCPConn) {
 		buf,_ := protocol.UnPack(rbuf[:rsize])
 		msg:= protocol.ConvertMessage(buf)
 
+		fmt.Println("读取到字节流是：", rbuf[:rsize])
 		fmt.Println("读取到字节流是：", buf)
 		fmt.Println("读取到对象是：", msg)
 		fmt.Println("数据body是：",string(msg.MsgBody))
@@ -75,8 +76,19 @@ func read(conn *net.TCPConn) {
 	}
 }
 
+func getBroadcast()  {
+	conn, err := net.Dial("udp", "192.168.6.255:9999")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	defer conn.Close()
+	data ,err := protocol.Pack(110, []byte{'a', 'b', 'c', 'd', 'e', 'f', 'a', 's', 'd', 'f', 'd'})
+	conn.Write(data)
+}
+
 func main() {
-	tcpAddr, err := net.ResolveTCPAddr("tcp", "localhost:8989")
+	tcpAddr, err := net.ResolveTCPAddr("tcp", "118.31.46.174:8989")
 	if err != nil {
 		logger.Error("", err)
 	}
@@ -89,6 +101,12 @@ func main() {
 	fmt.Println(data)
 	go write(conn, data)
 	go read(conn)
+	go func() {
+		for {
+			getBroadcast()
+			time.Sleep(time.Millisecond*100)
+		}
+	}()
 	for {
 		time.Sleep(time.Second * 10)
 	}

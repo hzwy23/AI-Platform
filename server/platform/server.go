@@ -26,6 +26,11 @@ func NewDefaultPlatformServer(ip string, port int, protocol string) Server {
 	return r
 }
 
+func UDP(conn *net.UDPConn) {
+	udp := defaultPlatformServer{}
+	udp.server(conn)
+}
+
 func (r *defaultPlatformServer) Start() {
 	listen, err := net.Listen(r.protocol, r.convert())
 	if err != nil {
