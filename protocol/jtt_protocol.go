@@ -72,6 +72,10 @@ func (r *JTTProtocol) Parse() ([]byte, error) {
 }
 
 func UnPack(msgData []byte) ([]byte, error) {
+	if len(msgData) < 26 {
+		logger.Error(msgData)
+		return nil, errors.New("接收数据报文信息不正确")
+	}
 	// 转义
 	realMsg := unpackescapse(msgData)
 	// 检查长度

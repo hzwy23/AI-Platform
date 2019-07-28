@@ -8,12 +8,19 @@ import (
 type DeviceManageInfoDao interface {
 	FindAll() ([]entity.DeviceManageInfo, error)
 	FindByDeviceId(deviceId int) (entity.DeviceManageInfo, error)
+	FindBySerialNumber(serialNumber string)(entity.DeviceManageInfo, error)
 	LogicDeleteById(deviceId int) (int64, error)
 	Update(item entity.DeviceManageInfo) (int64, error)
 	Insert(item entity.DeviceManageInfo) (int64, error)
 }
 
 type deviceManageInfoDaoImpl struct {
+}
+
+func (r *deviceManageInfoDaoImpl) FindBySerialNumber(serialNumber string) (entity.DeviceManageInfo, error) {
+	rst := entity.DeviceManageInfo{}
+	err := dbobj.QueryForStruct("select device_id, serial_number, device_name, dhcp_flag, device_ip, device_port, device_status, device_attribute, device_power, device_light_threshold, device_brightness, device_temperature, auto_start_time, auto_end_time, light_mode, mac_address, firmware_version, longitude, latitude, address, mask, gateway, pin, create_by, create_date, update_by, update_data, delete_status, power_total, strobe_count from device_manage_info where delete_status = 0 and device_id = ?", &rst, serialNumber)
+	return rst, err
 }
 
 func NewDeviceManageInfoDao() DeviceManageInfoDao {

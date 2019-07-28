@@ -113,8 +113,10 @@ func init() {
 	AddConnUrl("/")
 	AddConnUrl("/api/device/group")
 	AddConnUrl("/api/login")
+	AddConnUrl("/api/scan/device")
 
 	/// 设置白名单，免授权请求
 	AddAuthUrl("/api/device/group")
 	AddAuthUrl("/api/login")
+	AddAuthUrl("/api/scan/device")
 }

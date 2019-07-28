@@ -2,33 +2,57 @@ package entity
 
 type DeviceManageInfo struct {
 	DeviceId             int
+	// 设备序列号
 	SerialNumber         string
+	// 设备名称
 	DeviceName           string
+	// 使用自动获取IP，0：否，1：是
 	DhcpFlag             uint8
+	// 设备IP
 	DeviceIp             string
+	// 设备服务端口
 	DevicePort           string
+	// 设备状态，平台使用，设备不使用
 	DeviceStatus         uint8
+	// 设备属性
 	DeviceAttribute      uint8
+	// 设备功率
 	DevicePower          int
+	// 设备光敏阀值
 	DeviceLightThreshold uint8
+	//设备亮度
 	DeviceBrightness     uint8
+	// 设备温度
 	DeviceTemperature    uint8
+	// 自动开启时间
 	AutoStartTime        string
+	// 自动结束时间
 	AutoEndTime          string
+	// 补光模式，1：光敏控制，2：时间控制，3：光敏+时间
 	LightMode            uint8
+	// MAC地址
 	MacAddress           string
+	// 固件版本
 	FirmwareVersion      string
+	// 经度
 	Longitude            string
+	// 纬度
 	Latitude             string
+	// 安装地址
 	Address              string
+	// 掩码
 	Mask                 string
+	// 网关
 	Gateway              string
+	// 设备PIN码，平台使用，设备不使用
 	Pin                  string
 	CreateBy             string
 	CreateDate           string
 	UpdateBy             string
 	UpdateData           string
 	DeleteStatus         uint8
+	// 总功耗
 	PowerTotal           int
+	// 爆闪次数
 	StrobeCount          int
 }

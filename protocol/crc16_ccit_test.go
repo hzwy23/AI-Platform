@@ -6,6 +6,6 @@ import (
 )
 
 func TestCRC16CCITT(t *testing.T) {
-	crcval, crcstr := CRC16CCITT([]byte{48, 49, 50, 51, 52, 53, 54, 55, 56})
+	crcval, crcstr := CRC16CCITT([]byte{0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39})
 	fmt.Println(crcval, crcstr)
 }

@@ -3,10 +3,28 @@ package main
 import (
 	"ai-platform/panda/logger"
 	"ai-platform/protocol"
+	"encoding/json"
 	"fmt"
 	"net"
 	"time"
 )
+
+type DeviceInfo struct {
+	// 设别序列号
+	SerialNumber string
+	// 软件版本号
+	FirmwareVersion string
+	// 设备IP地址
+	Ip string
+	// 设备掩码
+	Mask string
+	// 网关地址
+	GatewayAddr string
+	// 设备端口号
+	Port string
+	// 设备mac地址
+	MacAddr string
+}
 
 func reconnect() (*net.TCPConn, error) {
 	tcpAddr, err := net.ResolveTCPAddr("tcp", "118.31.46.174:8989")
@@ -53,7 +71,10 @@ func read(conn *net.TCPConn) {
 		rbuf := make([]byte, 128)
 		rsize, err := conn.Read(rbuf)
 
-		buf,_ := protocol.UnPack(rbuf[:rsize])
+		buf,err := protocol.UnPack(rbuf[:rsize])
+		if err != nil {
+			return
+		}
 		msg:= protocol.ConvertMessage(buf)
 
 		fmt.Println("读取到字节流是：", rbuf[:rsize])
@@ -77,13 +98,30 @@ func read(conn *net.TCPConn) {
 }
 
 func getBroadcast()  {
-	conn, err := net.Dial("udp", "192.168.6.255:9999")
+	conn, err := net.Dial("udp", "192.168.2.255:9999")
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 	defer conn.Close()
-	data ,err := protocol.Pack(110, []byte{'a', 'b', 'c', 'd', 'e', 'f', 'a', 's', 'd', 'f', 'd'})
+	dt := DeviceInfo{
+		// 设别序列号
+		SerialNumber: "DTP00001",
+		// 软件版本号
+		FirmwareVersion: "V0.0.1",
+		// 设备IP地址
+		Ip: "192.168.1.1",
+		// 设备掩码
+		Mask:"255.255.255.0",
+		// 网关地址
+		GatewayAddr:"192.168.1.1",
+		// 设备端口号
+		Port:"8070",
+		// 设备mac地址
+		MacAddr:"5f-34-54-34-54",
+	}
+	dtJson, _ := json.Marshal(dt)
+	data ,err := protocol.Pack(110, dtJson)
 	conn.Write(data)
 }
 
@@ -97,7 +135,7 @@ func main() {
 		logger.Error("连接失败，", err)
 	}
 	defer conn.Close()
-	data ,err := protocol.Pack(888, []byte{'a', 'b', 'c', 'd', 'e', 'f', 'a', 's', 'd', 'f', 'd'})
+	data ,err := protocol.Pack(888, []byte{'i', 'o', 't', 'h', 'u', 'b', 'a', 's', 'd', 'f', 'd'})
 	fmt.Println(data)
 	go write(conn, data)
 	go read(conn)
