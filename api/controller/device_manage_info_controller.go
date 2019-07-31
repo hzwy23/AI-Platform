@@ -31,7 +31,7 @@ FROM
 	device_manage_info t 
 WHERE
 	t.delete_status = 0 
-	AND not EXISTS ( SELECT 1 FROM group_device_bind b where t.device_id = b.device_id )`
+	AND not EXISTS ( SELECT 1 FROM group_device_bind b where t.device_id = b.device_id and delete_status = 0 )`
 
 func (r *DeviceManageInfoController) Get(resp http.ResponseWriter, req *http.Request) {
 	req.ParseForm()
@@ -128,6 +128,22 @@ func (r *DeviceManageInfoController) Delete(resp http.ResponseWriter, req *http.
 	hret.Success(resp, "Success")
 }
 
+func (r *DeviceManageInfoController) RemoveFromGroup(resp http.ResponseWriter, req *http.Request, param route.Params) {
+	deviceId := param.ByName("id")
+	sid, err := strconv.Atoi(deviceId)
+	if err != nil {
+		logger.Error("无效的设备号")
+		hret.Error(resp, 500300, deviceId)
+		return
+	}
+	_, err = dbobj.Exec("update group_device_bind set delete_status = 1 where device_id = ?", sid)
+	if err != nil {
+		hret.Error(resp, 500500, err.Error())
+		return
+	}
+	hret.Success(resp, "Success")
+}
+
 // 查询所有没有分组的设备
 func (r *DeviceManageInfoController) GetUnGroupDevice(resp http.ResponseWriter, req *http.Request) {
 	rst := make([]vo.UnGroupDeviceVo,0)
@@ -180,6 +196,23 @@ func (r *DeviceManageInfoController) UpdateDeviceGroup(resp http.ResponseWriter,
 	hret.Success(resp,"Success")
 }
 
+func (r *DeviceManageInfoController) ChangeGroup(resp http.ResponseWriter, req *http.Request)  {
+	req.ParseForm()
+	deviceId := req.FormValue("DeviceId")
+	groupId := req.FormValue("GroupId")
+	claim, err := jwt.ParseHttp(req)
+	if err != nil {
+		logger.Error(err)
+		hret.Error(resp, 403, "权限不足")
+		return
+	}
+
+	dbobj.Exec("update group_device_bind set delete_status = 1 where device_id = ?", deviceId)
+	dbobj.Exec("insert into group_device_bind(group_id, device_id, create_by, create_date, update_by, update_date, delete_status) values(?,?,?,?,?,?,0)",
+		groupId, deviceId, claim.UserId, panda.CurTime(), claim.UserId, panda.CurTime())
+	hret.Success(resp,"Success")
+}
+
 func init() {
 	ctl := &DeviceManageInfoController{
 		service: service.NewDeviceManageService(),
@@ -189,5 +222,7 @@ func init() {
 	route.Handler("POST", "/api/device/manage", ctl.Post)
 	route.Handler("POST", "/api/device/manage/group", ctl.UpdateDeviceGroup)
 	route.Handler("PUT", "/api/device/manage", ctl.Put)
+	route.Handler("PUT","/api/device/group/change", ctl.ChangeGroup)
 	route.DELETE("/api/device/manage/:deviceId", ctl.Delete)
+	route.DELETE("/api/device/bind/:id", ctl.RemoveFromGroup)
 }

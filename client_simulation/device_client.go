@@ -27,7 +27,7 @@ type DeviceInfo struct {
 }
 
 func reconnect() (*net.TCPConn, error) {
-	tcpAddr, err := net.ResolveTCPAddr("tcp", "118.31.46.174:8989")
+	tcpAddr, err := net.ResolveTCPAddr("tcp", "121.42.143.130:8989")
 	if err != nil {
 		logger.Error("", err)
 	}
@@ -98,7 +98,7 @@ func read(conn *net.TCPConn) {
 }
 
 func getBroadcast()  {
-	conn, err := net.Dial("udp", "192.168.2.255:9999")
+	conn, err := net.Dial("udp", "121.42.143.130:8900")
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -126,7 +126,7 @@ func getBroadcast()  {
 }
 
 func main() {
-	tcpAddr, err := net.ResolveTCPAddr("tcp", "118.31.46.174:8989")
+	tcpAddr, err := net.ResolveTCPAddr("tcp", "121.42.143.130:8989")
 	if err != nil {
 		logger.Error("", err)
 	}
