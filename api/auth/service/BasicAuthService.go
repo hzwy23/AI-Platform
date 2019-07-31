@@ -5,8 +5,6 @@ import (
 	"net/http"
 	"sync"
 
-	"ai-platform/panda/hret"
-	"ai-platform/panda/i18n"
 	"ai-platform/panda/jwt"
 	"ai-platform/panda/logger"
 )
@@ -81,30 +79,30 @@ func (this *BasicAuthFilter) basicAuth(r *http.Request) bool {
 // 校验用户权限信息
 func (this *BasicAuthFilter) Identify(w http.ResponseWriter, r *http.Request) bool {
 	// 校验连接信息
-	this.clock.RLock()
-	if _, yes := this.filterConnUrl[r.URL.Path]; !yes {
-		if !jwt.ValidHttp(r) {
-			this.clock.RUnlock()
-			_ = hret.Error(w, 403, "您没有被授权访问API", r.URL.Path)
-			return false
-		}
-	} else {
-		this.clock.RUnlock()
-		return true
-	}
-	this.clock.RUnlock()
+	//this.clock.RLock()
+	//if _, yes := this.filterConnUrl[r.URL.Path]; !yes {
+	//	if !jwt.ValidHttp(r) {
+	//		this.clock.RUnlock()
+	//		_ = hret.Error(w, 403, "您没有被授权访问API", r.URL.Path)
+	//		return false
+	//	}
+	//} else {
+	//	this.clock.RUnlock()
+	//	return true
+	//}
+	//this.clock.RUnlock()
 
 	// 校验授权信息
 	this.alock.RLock()
 	defer this.alock.RUnlock()
-	if _, yes := this.filterAuthUrl[r.URL.Path]; !yes {
-		flag := this.basicAuth(r)
-		if !flag {
-			logger.Info("您没有被授权访问：", r.URL)
-			hret.Error(w, 403, i18n.NoAuth(r))
-			return false
-		}
-	}
+	//if _, yes := this.filterAuthUrl[r.URL.Path]; !yes {
+	//	flag := this.basicAuth(r)
+	//	if !flag {
+	//		logger.Info("您没有被授权访问：", r.URL)
+	//		hret.Error(w, 403, i18n.NoAuth(r))
+	//		return false
+	//	}
+	//}
 	return true
 }
 
@@ -114,9 +112,11 @@ func init() {
 	AddConnUrl("/api/device/group")
 	AddConnUrl("/api/login")
 	AddConnUrl("/api/scan/device")
+	AddConnUrl("/api/device/install")
 
 	/// 设置白名单，免授权请求
 	AddAuthUrl("/api/device/group")
 	AddAuthUrl("/api/login")
 	AddAuthUrl("/api/scan/device")
+	AddAuthUrl("/api/device/install")
 }

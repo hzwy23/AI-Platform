@@ -14,13 +14,12 @@ type DeviceScanController struct {
 	deviceScan service.DeviceScanService
 }
 
-func (r *DeviceScanController)Get(resp http.ResponseWriter, req *http.Request)  {
+func (r *DeviceScanController) Get(resp http.ResponseWriter, req *http.Request) {
 	dt, idx, err := r.deviceScan.FindAll()
 	if err != nil {
 		logger.Warn(err)
-		hret.Error(resp,5002001, err.Error())
+		hret.Error(resp, 5002001, err.Error())
 	}
-
 
 	ok := hret.RetContent{
 		Code:    200,
@@ -39,10 +38,9 @@ func (r *DeviceScanController)Get(resp http.ResponseWriter, req *http.Request)  
 	resp.Write(ijs)
 }
 
-
 func init() {
 	scan := &DeviceScanController{
-		deviceScan:service.NewDeviceScanService(),
+		deviceScan: service.NewDeviceScanService(),
 	}
 	route.Handler("GET", "/api/scan/device", scan.Get)
 }

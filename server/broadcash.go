@@ -1,6 +1,7 @@
 package server
 
 import (
+	"ai-platform/dbobj"
 	"ai-platform/panda/config"
 	"ai-platform/panda/logger"
 	"ai-platform/server/platform"
@@ -11,13 +12,30 @@ import (
 	"time"
 )
 
+// 获取广播地址顺序
+// 1. 从数据库读取广播地址
+// 2. 如果数据库为空，则使用配置文件广播地址
+// 3. 如果配置文件广播地址为空，则读取第一张网卡广播地址
+
 func GetBroadcast() []string {
 	ipNets, err := GetIp()
 	if err != nil {
-		fmt.Println(err)
+		logger.Error(err)
 		return nil
 	}
 	return Get(ipNets)
+}
+
+func GetBroadcastIpFromDb() (string, error){
+	rst := ""
+	err := dbobj.QueryForObject("select item_value from sys_global_config where item_id = ?", dbobj.PackArgs(1), &rst)
+	return rst, err
+}
+
+func GetBroadcastPortFromDb() (string, error){
+	rst := ""
+	err := dbobj.QueryForObject("select item_value from sys_global_config where item_id = ?", dbobj.PackArgs(2), &rst)
+	return rst, err
 }
 
 func Get(ipNets []*net.IPNet) []string {
@@ -78,6 +96,7 @@ func Broadcast(ip string, port string) {
 	defer conn.Close()
 
 	logger.Info("开启广播服务, broadcast ip is:", ip, ", port is:",port)
+	fmt.Println("开启广播服务, broadcast ip is:", ip, ", port is:",port)
 	for {
 		platform.UDP(conn)
 		time.Sleep(time.Millisecond * 50)
@@ -85,29 +104,46 @@ func Broadcast(ip string, port string) {
 }
 
 func defaultIpAndPort() (string, string) {
-	ip := ""
-	port := ""
-	c, err := config.Load("conf/app.conf", config.INI)
-	if err == nil {
-		// 从配置文件中读取端口号
-		mPort, err := c.Get("ai.platform.broadcast.port")
+	ip, err := GetBroadcastIpFromDb()
+	if err != nil {
+		fmt.Println(err)
+		logger.Error(err)
+	}
+
+	port, err := GetBroadcastPortFromDb()
+	if err != nil {
+		fmt.Println(err)
+		logger.Info(err)
+	}
+
+	fmt.Println(ip, port)
+	if len(ip) == 0 || len(port) == 0 {
+		// 获取配置文件广播地址
+		c, err := config.Load("conf/app.conf", config.INI)
 		if err == nil {
-			port = mPort
-		}
-		mIp, err := c.Get("ai.platform.broadcast.ip")
-		if len(strings.TrimSpace(mIp)) > 0 {
-			ip = mIp
+			// 从配置文件中读取端口号
+			mPort, err := c.Get("ai.platform.broadcast.port")
+			if len(port) == 0 && err == nil {
+				port = mPort
+			}
+			mIp, err := c.Get("ai.platform.broadcast.ip")
+			if len(strings.TrimSpace(mIp)) > 0 && len(ip) == 0 {
+				ip = mIp
+			}
 		}
 	}
+
 	return ip, port
 }
 
 func init() {
+
 	ip, port := defaultIpAndPort()
 	if len(port) <= 0 {
 		logger.Error("广播服务无法启动，请设置广播端口")
 		return
 	}
+
 	if len(ip) > 0 {
 		go Broadcast(ip, port)
 	} else {

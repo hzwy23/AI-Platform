@@ -10,10 +10,15 @@ type GroupDeviceService interface {
 	AddGroup(groupName string, userId string) error
 	FindByPage(pageNumber int, pageSize int) ([]entity.DeviceGroupInfo, error)
 	DeleteByGroupId(groupId int) (int64, error)
+	UpdateGroupName(item entity.DeviceGroupInfo) error
 }
 
 type groupDeviceServiceImpl struct {
 	dao dao.DeviceGroupInfoDao
+}
+
+func (r *groupDeviceServiceImpl) UpdateGroupName(item entity.DeviceGroupInfo) error {
+	return r.dao.UpdateById(item)
 }
 
 func (r *groupDeviceServiceImpl) FindByPage(pageNumber int, pageSize int) ([]entity.DeviceGroupInfo, error) {

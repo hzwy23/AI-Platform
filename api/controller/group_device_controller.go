@@ -1,12 +1,13 @@
 package controller
 
 import (
+	"ai-platform/api/entity"
 	"ai-platform/api/service"
+	"ai-platform/panda"
 	"ai-platform/panda/hret"
 	"ai-platform/panda/jwt"
 	"ai-platform/panda/logger"
 	"ai-platform/panda/route"
-	"fmt"
 	"net/http"
 	"strconv"
 )
@@ -47,11 +48,39 @@ func (r *GroupDeviceController) Post(resp http.ResponseWriter, req *http.Request
 }
 
 func (r *GroupDeviceController) Put(resp http.ResponseWriter, req *http.Request) {
+	req.ParseForm()
+	form := req.PostForm
 
+	groupName := form.Get("GroupName")
+	groupId := form.Get("GroupId")
+	sid, err := strconv.Atoi(groupId)
+	if err != nil {
+		hret.Error(resp, 500345, err.Error())
+		return
+	}
+	claim, err := jwt.ParseHttp(req)
+	if err != nil {
+		logger.Error(err)
+		hret.Error(resp, 403, "权限不足")
+		return
+	}
+
+	item := entity.DeviceGroupInfo{
+		GroupId:    sid,
+		GroupName:  groupName,
+		UpdateBy:   claim.UserId,
+		UpdateDate: panda.CurTime(),
+	}
+
+	err = r.groupDeviceService.UpdateGroupName(item)
+	if err != nil {
+		hret.Error(resp, 50000001, err.Error(), groupName)
+		return
+	}
+	hret.Success(resp, "OK")
 }
 
 func (r *GroupDeviceController) Delete(resp http.ResponseWriter, req *http.Request, param route.Params) {
-	fmt.Println(param)
 	groupId := param.ByName("groupId")
 	id, err := strconv.Atoi(groupId)
 	if err != nil {

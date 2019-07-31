@@ -7,14 +7,14 @@ import (
 )
 
 type DeviceScanService interface {
-	FindAll() ([]entity.DeviceScan,int, error)
+	FindAll() ([]entity.DeviceScan, int, error)
 }
 
 type deviceScanServiceImpl struct {
 	deviceManageInfoDao dao.DeviceManageInfoDao
 }
 
-func (r *deviceScanServiceImpl) FindAll() ([]entity.DeviceScan,int, error){
+func (r *deviceScanServiceImpl) FindAll() ([]entity.DeviceScan, int, error) {
 	data := make([]entity.DeviceScan, 0)
 	ret := service.GetOnlineDevice()
 	idx := 0
@@ -35,9 +35,9 @@ func (r *deviceScanServiceImpl) FindAll() ([]entity.DeviceScan,int, error){
 			// 设备mac地址
 			MacAddr: val.MacAddr,
 		}
-		element, err :=r.deviceManageInfoDao.FindBySerialNumber(val.SerialNumber)
-		if err != nil {
-			item.SerialNumber = element.SerialNumber
+		element, err := r.deviceManageInfoDao.FindBySerialNumber(val.SerialNumber)
+		if err == nil && element.SerialNumber == val.SerialNumber {
+			item.IsAdded = true
 			idx += 1
 		}
 		data = append(data, item)
@@ -45,7 +45,7 @@ func (r *deviceScanServiceImpl) FindAll() ([]entity.DeviceScan,int, error){
 	return data, idx, nil
 }
 
-func NewDeviceScanService() DeviceScanService{
+func NewDeviceScanService() DeviceScanService {
 	r := &deviceScanServiceImpl{
 		deviceManageInfoDao: dao.NewDeviceManageInfoDao(),
 	}

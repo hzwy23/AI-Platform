@@ -4,7 +4,6 @@ import (
 	"ai-platform/panda/logger"
 	"ai-platform/protocol"
 	"errors"
-	"fmt"
 	"sync"
 )
 
@@ -21,7 +20,7 @@ func NewContext(protoService protocol.CommunicationService, data []byte) (*Conte
 	}
 	msg := protocol.ConvertMessage(data)
 	if msg == nil {
-		fmt.Println("异常数据格式：", data)
+		logger.Error("异常数据格式：", data)
 		return nil, errors.New("返回消息格式不不正确")
 	}
 	logger.Info("convert message is: ", *msg)

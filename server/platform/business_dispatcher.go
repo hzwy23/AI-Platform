@@ -2,7 +2,6 @@ package platform
 
 import (
 	"ai-platform/panda/logger"
-	"fmt"
 	"sync"
 )
 
@@ -49,6 +48,6 @@ func dispatcher(context *Context) {
 	go func() {
 		msgId := context.msgId
 		msg := context.message
-		fmt.Println("报文信息是：",msgId, *msg)
+		logger.Info("报文信息是：",msgId, *msg)
 	}()
 }
