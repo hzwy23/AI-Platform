@@ -32,7 +32,7 @@ func (login *LoginController) Post(w http.ResponseWriter, r *http.Request) {
 
 	token, _ := jwt.GenToken(jwt.NewUserdata().SetUserId(form.Get("username")))
 
-	cookie := http.Cookie{Name: "Authorization", Value: token, Path: "/", MaxAge: int(172800)}
+	cookie := http.Cookie{Name: "Authorization", Value: token, Path: "/", MaxAge: int(1728000)}
 
 	http.SetCookie(w, &cookie)
 

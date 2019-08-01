@@ -3,6 +3,7 @@ package service
 import (
 	"ai-platform/api/dao"
 	"ai-platform/api/entity"
+	"ai-platform/dbobj"
 	"ai-platform/server/service"
 )
 
@@ -19,23 +20,30 @@ func (r *deviceScanServiceImpl) FindAll() ([]entity.DeviceScan, int, error) {
 	ret := service.GetOnlineDevice()
 	idx := 0
 	for _, val := range ret {
+
+		address := ""
+		dbobj.QueryForObject("select device_address from device_install_info where delete_status = 0 and serial_number = ?",dbobj.PackArgs(val.SerialNumber),&address)
+
 		item := entity.DeviceScan{
 			// 设别序列号
 			SerialNumber: val.SerialNumber,
 			// 软件版本号
 			FirmwareVersion: val.FirmwareVersion,
 			// 设备IP地址
-			Ip: val.Ip,
+			DeviceIp: val.DeviceIp,
 			// 设备掩码
 			Mask: val.Mask,
 			// 网关地址
 			GatewayAddr: val.GatewayAddr,
 			// 设备端口号
-			Port: val.Port,
+			DevicePort: val.DevicePort,
 			// 设备mac地址
 			MacAddr: val.MacAddr,
+			// 安装位置
+			DeviceAddress: address,
 		}
 		element, err := r.deviceManageInfoDao.FindBySerialNumber(val.SerialNumber)
+
 		if err == nil && element.SerialNumber == val.SerialNumber {
 			item.IsAdded = true
 			idx += 1

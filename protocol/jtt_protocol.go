@@ -37,6 +37,33 @@ func NewJTTProtocol(conn net.Conn) *JTTProtocol {
 	return r
 }
 
+func NewJTTProtocolUDP(conn *net.UDPConn) *JTTProtocol {
+	r := &JTTProtocol{
+		buffer:    make([]byte, 0),
+		message:   make([]byte, 0),
+		conn:      conn,
+		lock:      new(sync.RWMutex),
+		isClosed:  false,
+		closeLock: new(sync.RWMutex),
+	}
+	go r.read()
+	return r
+}
+
+
+func NewUDPJTTProtocol(conn *net.UDPConn) *JTTProtocol {
+	r := &JTTProtocol{
+		buffer:    make([]byte, 0),
+		message:   make([]byte, 0),
+		conn:      conn,
+		lock:      new(sync.RWMutex),
+		isClosed:  false,
+		closeLock: new(sync.RWMutex),
+	}
+	go r.readFromUdp(conn)
+	return r
+}
+
 // JTT格式数据协议
 type JTTProtocol struct {
 	buffer    []byte
@@ -148,7 +175,29 @@ func (r *JTTProtocol) read() {
 		r.buffer = append(r.buffer, tmp[:size]...)
 		r.lock.Unlock()
 	}
+}
 
+func (r *JTTProtocol) readFromUdp(conn *net.UDPConn) {
+	for {
+		tmp := make([]byte, 256)
+		size,_, err := conn.ReadFromUDP(tmp)
+		if err != nil {
+			logger.Error("读取socket内容失败，失败原因是：", err)
+			r.closeLock.Lock()
+			r.isClosed = true
+			r.closeLock.Unlock()
+			break
+		}
+		if size == 0 {
+			time.Sleep(100 * 1e6)
+			continue
+		}
+		// 如果解析到message，则触发相应的处理逻辑
+		r.lock.Lock()
+		logger.Debug("receive byte is: ", tmp[:size])
+		r.buffer = append(r.buffer, tmp[:size]...)
+		r.lock.Unlock()
+	}
 }
 
 // 解析是否获取一个完成的报文

@@ -15,13 +15,13 @@ type DeviceInfo struct {
 	// 软件版本号
 	FirmwareVersion string
 	// 设备IP地址
-	Ip string
+	DeviceIp string
 	// 设备掩码
 	Mask string
 	// 网关地址
 	GatewayAddr string
 	// 设备端口号
-	Port string
+	DevicePort string
 	// 设备mac地址
 	MacAddr string
 }
@@ -98,47 +98,49 @@ func read(conn *net.TCPConn) {
 }
 
 func getBroadcast()  {
-	conn, err := net.Dial("udp", "121.42.143.130:8900")
+	conn, err := net.Dial("udp", "192.168.2.255:8900")
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 	defer conn.Close()
+	fmt.Println("连接成功")
 	dt := DeviceInfo{
 		// 设别序列号
 		SerialNumber: "DTP00001",
 		// 软件版本号
 		FirmwareVersion: "V0.0.1",
 		// 设备IP地址
-		Ip: "192.168.1.1",
+		DeviceIp: "192.168.1.1",
 		// 设备掩码
 		Mask:"255.255.255.0",
 		// 网关地址
 		GatewayAddr:"192.168.1.1",
 		// 设备端口号
-		Port:"8070",
+		DevicePort:"8070",
 		// 设备mac地址
 		MacAddr:"5f-34-54-34-54",
 	}
 	dtJson, _ := json.Marshal(dt)
 	data ,err := protocol.Pack(110, dtJson)
-	conn.Write(data)
+	size,err:=conn.Write(data)
+	fmt.Println("write",size,err)
 }
 
 func main() {
-	tcpAddr, err := net.ResolveTCPAddr("tcp", "121.42.143.130:8989")
-	if err != nil {
-		logger.Error("", err)
-	}
-	conn, err := net.DialTCP("tcp", nil, tcpAddr)
-	if err != nil {
-		logger.Error("连接失败，", err)
-	}
-	defer conn.Close()
-	data ,err := protocol.Pack(888, []byte{'i', 'o', 't', 'h', 'u', 'b', 'a', 's', 'd', 'f', 'd'})
-	fmt.Println(data)
-	go write(conn, data)
-	go read(conn)
+	//tcpAddr, err := net.ResolveTCPAddr("tcp", "121.42.143.130:8989")
+	//if err != nil {
+	//	logger.Error("", err)
+	//}
+	//conn, err := net.DialTCP("tcp", nil, tcpAddr)
+	//if err != nil {
+	//	logger.Error("连接失败，", err)
+	//}
+	//defer conn.Close()
+	//data ,err := protocol.Pack(888, []byte{'i', 'o', 't', 'h', 'u', 'b', 'a', 's', 'd', 'f', 'd'})
+	//fmt.Println(data)
+	//go write(conn, data)
+	//go read(conn)
 	go func() {
 		for {
 			getBroadcast()

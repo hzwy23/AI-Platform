@@ -20,7 +20,7 @@ type DeviceManageInfo struct {
 	DevicePower int
 	// 设备光敏阀值
 	DeviceLightThreshold uint8
-	//设备亮度
+	// 设备亮度
 	DeviceBrightness uint8
 	// 设备温度
 	DeviceTemperature uint8
@@ -38,8 +38,6 @@ type DeviceManageInfo struct {
 	Longitude string
 	// 纬度
 	Latitude string
-	// 安装地址
-	Address string
 	// 掩码
 	Mask string
 	// 网关
@@ -55,4 +53,8 @@ type DeviceManageInfo struct {
 	PowerTotal int
 	// 爆闪次数
 	StrobeCount int
+	// 分组ID
+	GroupId int
+	// 分组名称
+	GroupName string
 }

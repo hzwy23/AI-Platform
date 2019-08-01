@@ -28,7 +28,7 @@ func NewDefaultPlatformServer(ip string, port int, protocol string) Server {
 
 func UDP(conn *net.UDPConn) {
 	udp := defaultPlatformServer{}
-	udp.server(conn)
+	udp.udpServer(conn)
 }
 
 func (r *defaultPlatformServer) Start() {
@@ -51,6 +51,28 @@ func (r *defaultPlatformServer) Start() {
 
 func (r *defaultPlatformServer) server(conn net.Conn) {
 	protoService := protocol.NewJTTProtocol(conn)
+	for {
+		message, err := protoService.Parse()
+		if err != nil {
+			logger.Info("读取内容失败，失败原因是：", err)
+			return
+		}
+		if message == nil {
+			time.Sleep(time.Millisecond * 100)
+			continue
+		}
+		logger.Info("receive message is: ", message)
+		context, err := NewContext(protoService, message)
+		if err != nil {
+			continue
+		}
+		dispatcher(context)
+		time.Sleep(time.Millisecond * 100)
+	}
+}
+
+func (r *defaultPlatformServer) udpServer(conn *net.UDPConn) {
+	protoService := protocol.NewUDPJTTProtocol(conn)
 	for {
 		message, err := protoService.Parse()
 		if err != nil {

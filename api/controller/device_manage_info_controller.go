@@ -80,6 +80,7 @@ func (r *DeviceManageInfoController) Post(resp http.ResponseWriter, req *http.Re
 		DeviceIp: req.FormValue("DeviceIp"),
 		// 设备服务端口
 		DevicePort:   req.FormValue("DevicePort"),
+
 		DeviceStatus: 1,
 		// 设备属性
 		//DeviceAttribute: uint8(attribute),
