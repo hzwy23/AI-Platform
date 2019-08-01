@@ -98,7 +98,7 @@ func read(conn *net.TCPConn) {
 }
 
 func getBroadcast()  {
-	conn, err := net.Dial("udp", "121.42.143.130:8900")
+	conn, err := net.Dial("udp", "192.168.2.255:8900")
 	if err != nil {
 		fmt.Println(err)
 		return

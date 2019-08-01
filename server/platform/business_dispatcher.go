@@ -1,11 +1,14 @@
 package platform
 
 import (
+	"ai-platform/dbobj"
+	"ai-platform/panda"
 	"ai-platform/panda/logger"
+	"encoding/json"
 	"sync"
 )
 
-type Handler func(context *Context)
+type Handler func(context *Context) (int, string)
 
 type BusinessDispatcher struct {
 	// 业务类型对应的处理函数
@@ -29,13 +32,14 @@ func (r *BusinessDispatcher) Register(msgId uint16, handler Handler) {
 	r.msgIdHandler[msgId] = handler
 }
 
-func (r *BusinessDispatcher) dispatcher(context *Context) {
+func (r *BusinessDispatcher) dispatcher(context *Context) (int, string){
 	r.lock.RLock()
 	defer r.lock.RUnlock()
 	if handler, ok := r.msgIdHandler[context.GetMsgId()]; ok {
-		handler(context)
+		return handler(context)
 	} else {
 		logger.Error("无效的业务类型, 业务类型是：", context.GetMsgId())
+		return 500, "无效的业务类型"
 	}
 }
 
@@ -44,10 +48,18 @@ func Register(msgId uint16, handler Handler) {
 }
 
 func dispatcher(context *Context) {
-	defaultBusinessDispatcher.dispatcher(context)
+	code, retMsg := defaultBusinessDispatcher.dispatcher(context)
 	go func() {
 		msgId := context.msgId
-		msg := context.message
-		logger.Info("报文信息是：",msgId, *msg)
+		msg := context.message.MsgBody
+		var rst interface{}
+		json.Unmarshal(msg, &rst)
+		body := rst.(map[string]interface{})
+
+		result, err := dbobj.Exec("insert into plat_device_logger(serial_number, handle_time, direction, biz_type, message, ret_code, ret_msg) values(?, ?, ?, ?, ?, ?, ?)",
+			body["client_CPUID"], panda.CurTime(), "Input", msgId, context.message.MsgBody, code, retMsg)
+		if err != nil {
+			logger.Error(result, err, *context.message)
+		}
 	}()
 }

@@ -55,7 +55,7 @@ type DeviceInfo struct {
 	MacAddr string
 }
 
-func broadcast(context *platform.Context) {
+func broadcast(context *platform.Context) (int, string){
 	bd := &DeviceInfo{}
 	err := json.Unmarshal(context.GetMessage().MsgBody, bd)
 	if err == nil {
@@ -68,6 +68,7 @@ func broadcast(context *platform.Context) {
 		deviceScan[bd.SerialNumber] = online
 		lock.Unlock()
 	}
+	return 200, "Ok"
 }
 
 func init() {
