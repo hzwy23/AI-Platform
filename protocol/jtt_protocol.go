@@ -179,7 +179,7 @@ func (r *JTTProtocol) read() {
 
 func (r *JTTProtocol) readFromUdp(conn *net.UDPConn) {
 	for {
-		tmp := make([]byte, 256)
+		tmp := make([]byte, 2048)
 		size,_, err := conn.ReadFromUDP(tmp)
 		if err != nil {
 			logger.Error("读取socket内容失败，失败原因是：", err)
