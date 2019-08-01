@@ -55,7 +55,7 @@ func dispatcher(context *Context) {
 		var rst interface{}
 		json.Unmarshal(msg, &rst)
 		body := rst.(map[string]interface{})
-
+		logger.Info("报文内容是：",rst)
 		result, err := dbobj.Exec("insert into plat_device_logger(serial_number, handle_time, direction, biz_type, message, ret_code, ret_msg) values(?, ?, ?, ?, ?, ?, ?)",
 			body["client_CPUID"], panda.CurTime(), "Input", msgId, string(msg), code, retMsg)
 		if err != nil {
