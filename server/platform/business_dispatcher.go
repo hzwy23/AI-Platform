@@ -57,7 +57,7 @@ func dispatcher(context *Context) {
 		body := rst.(map[string]interface{})
 
 		result, err := dbobj.Exec("insert into plat_device_logger(serial_number, handle_time, direction, biz_type, message, ret_code, ret_msg) values(?, ?, ?, ?, ?, ?, ?)",
-			body["client_CPUID"], panda.CurTime(), "Input", msgId, context.message.MsgBody, code, retMsg)
+			body["client_CPUID"], panda.CurTime(), "Input", msgId, string(msg), code, retMsg)
 		if err != nil {
 			logger.Error(result, err, *context.message)
 		}
