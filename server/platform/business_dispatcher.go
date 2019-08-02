@@ -56,6 +56,11 @@ func dispatcher(context *Context) {
 	}()
 	code, retMsg := defaultBusinessDispatcher.dispatcher(context)
 	go func() {
+		defer func() {
+			if r := recover(); r != nil {
+				fmt.Println(r)
+			}
+		}()
 		msgId := context.msgId
 		msg := context.message.MsgBody
 		if msg == nil || len(msg) == 0 {
