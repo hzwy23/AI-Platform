@@ -5,6 +5,7 @@ import (
 	"ai-platform/panda"
 	"ai-platform/panda/logger"
 	"encoding/json"
+	"fmt"
 	"sync"
 )
 
@@ -48,19 +49,28 @@ func Register(msgId uint16, handler Handler) {
 }
 
 func dispatcher(context *Context) {
+	defer func() {
+		if r := recover(); r != nil {
+			fmt.Println(r)
+		}
+	}()
 	code, retMsg := defaultBusinessDispatcher.dispatcher(context)
 	go func() {
 		msgId := context.msgId
 		msg := context.message.MsgBody
-		var rst interface{}
-		json.Unmarshal(msg, &rst)
-		body := rst.(map[string]interface{})
-		logger.Info("报文内容是：",rst)
-		bodyStr,_ := json.Marshal(body)
-		result, err := dbobj.Exec("insert into plat_device_logger(serial_number, handle_time, direction, biz_type, message, ret_code, ret_msg) values(?, ?, ?, ?, ?, ?, ?)",
-			body["client_CPUID"], panda.CurTime(), "Input", msgId, bodyStr, code, retMsg)
-		if err != nil {
-			logger.Error(result, err, *context.message)
+		if msg == nil || len(msg) == 0 {
+			logger.Error("收到无效的消息")
+		} else {
+			var rst interface{}
+			json.Unmarshal(msg, &rst)
+			body := rst.(map[string]interface{})
+			logger.Info("报文内容是：",rst)
+			bodyStr,_ := json.Marshal(body)
+			result, err := dbobj.Exec("insert into plat_device_logger(serial_number, handle_time, direction, biz_type, message, ret_code, ret_msg) values(?, ?, ?, ?, ?, ?, ?)",
+				body["client_CPUID"], panda.CurTime(), "Input", msgId, bodyStr, code, retMsg)
+			if err != nil {
+				logger.Error(result, err, *context.message)
+			}
 		}
 	}()
 }
