@@ -5,12 +5,13 @@ import (
 	"fmt"
 )
 
-func echo(context *platform.Context) (int, string){
+func asyncAutoControl(context *platform.Context) (int, string){
 	fmt.Println("echo:", context.GetMessage().MsgBody, context.GetMsgId())
-	context.Send(0x7fff, context.GetMessage().MsgBody)
+	context.Send(0x0005, context.GetMessage().MsgBody)
 	return 200,"OK"
 }
 
 func init() {
-	platform.Register(0x7fff, echo)
+	platform.Register(0x0005, asyncAutoControl)
 }
+

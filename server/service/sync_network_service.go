@@ -72,7 +72,7 @@ func broadcast(context *platform.Context) (int, string){
 }
 
 func init() {
-	platform.Register(uint16(110), broadcast)
+	platform.Register(0x0000, broadcast)
 	go func() {
 		for {
 			removeOfflineDevice()
