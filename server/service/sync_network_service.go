@@ -1,6 +1,10 @@
 package service
 
 import (
+	"ai-platform/api/dao"
+	"ai-platform/api/entity"
+	"ai-platform/dbobj"
+	"ai-platform/panda"
 	"ai-platform/panda/logger"
 	"ai-platform/server/platform"
 	"encoding/json"
@@ -19,6 +23,8 @@ type onlineDevice struct {
 
 var deviceScan = make(map[string]*onlineDevice, 0)
 var lock = &sync.RWMutex{}
+var alarm dao.EventAlarmInfoDao
+var device dao.DeviceManageInfoDao
 
 func GetOnlineDevice() map[string]*onlineDevice {
 	lock.RLock()
@@ -33,6 +39,38 @@ func removeOfflineDevice()  {
 			logger.Info("从设备扫描列表中删除设备", key)
 			lock.Lock()
 			delete(deviceScan, key)
+			dbobj.Exec("update device_manage_info set device_status = 4 where serial_number = ? and delete_status = 0", key)
+			item := entity.EventAlarmInfo{
+				EventTypeCd:       2,
+				OccurrenceTime:    panda.CurTime(),
+				SerialNumber:      key,
+				DeviceName:        "设备不存在",
+				DeviceIp:          "-",
+				DeviceAttribute:   0,
+				DeviceBrightness:  0,
+				DeviceTemperature: 0,
+				HandleStatus:      0,
+				DeleteStatus:      0,
+			}
+			// todo 生成离线异常信息
+			element, err := device.FindBySerialNumber(key)
+			if err != nil {
+				fmt.Println(err)
+			} else {
+				item = entity.EventAlarmInfo{
+					EventTypeCd:       2,
+					OccurrenceTime:    panda.CurTime(),
+					SerialNumber:      key,
+					DeviceName:        element.DeviceName,
+					DeviceIp:          element.DeviceIp,
+					DeviceAttribute:   element.DeviceAttribute,
+					DeviceBrightness:  element.DeviceBrightness,
+					DeviceTemperature: element.DeviceTemperature,
+					HandleStatus:      0,
+					DeleteStatus:      0,
+				}
+			}
+			alarm.Insert(item)
 			lock.Unlock()
 		}
 
@@ -78,6 +116,9 @@ func broadcast(context *platform.Context) (int, string){
 }
 
 func init() {
+	alarm = dao.NewEventAlarmInfoDao()
+	device = dao.NewDeviceManageInfoDao()
+
 	platform.Register(0x0000, broadcast)
 	go func() {
 		for {

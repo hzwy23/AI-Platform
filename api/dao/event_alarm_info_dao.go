@@ -19,9 +19,9 @@ type eventAlarmInfoDaoImpl struct {
 }
 
 func (r *eventAlarmInfoDaoImpl) Insert(item entity.EventAlarmInfo) (int64, error) {
-	ret, err := dbobj.Exec("insert into event_alarm_info(id, event_type_cd, occurrence_time, device_id, device_name, device_ip, device_attribute, device_brightness, device_temperature, handle_status, delete_status) values(?,?,?,?,?,?,?,?,?,?,0)",
+	ret, err := dbobj.Exec("insert into event_alarm_info(id, event_type_cd, occurrence_time, serial_number, device_name, device_ip, device_attribute, device_brightness, device_temperature, handle_status, delete_status) values(?,?,?,?,?,?,?,?,?,?,0)",
 		item.Id, item.EventTypeCd, item.OccurrenceTime,
-		item.DeviceId, item.DeviceName, item.DeviceIp,
+		item.SerialNumber, item.DeviceName, item.DeviceIp,
 		item.DeviceAttribute, item.DeviceBrightness, item.DeviceTemperature,
 		item.HandleStatus)
 	if ret == nil {
@@ -52,19 +52,19 @@ func (r *eventAlarmInfoDaoImpl) CloseById(status int, id int) (int64, error) {
 
 func (r *eventAlarmInfoDaoImpl) FindAll() ([]entity.EventAlarmInfo, error) {
 	rst := make([]entity.EventAlarmInfo, 0)
-	err := dbobj.QueryForSlice("select id, event_type_cd, occurrence_time, device_id, device_name, device_ip, device_attribute, device_brightness, device_temperature, handle_status from event_alarm_info where delete_status = 0", &rst)
+	err := dbobj.QueryForSlice("select id, event_type_cd, occurrence_time, serial_number, device_name, device_ip, device_attribute, device_brightness, device_temperature, handle_status from event_alarm_info where delete_status = 0", &rst)
 	return rst, err
 }
 
 func (r *eventAlarmInfoDaoImpl) FindByTypeCd(typeCd int) ([]entity.EventAlarmInfo, error) {
 	rst := make([]entity.EventAlarmInfo, 0)
-	err := dbobj.QueryForSlice("select id, event_type_cd, occurrence_time, device_id, device_name, device_ip, device_attribute, device_brightness, device_temperature, handle_status from event_alarm_info where delete_status = 0 and event_type_cd = ?", &rst, typeCd)
+	err := dbobj.QueryForSlice("select id, event_type_cd, occurrence_time, serial_number, device_name, device_ip, device_attribute, device_brightness, device_temperature, handle_status from event_alarm_info where delete_status = 0 and event_type_cd = ?", &rst, typeCd)
 	return rst, err
 }
 
 func (r *eventAlarmInfoDaoImpl) FindById(id int) (entity.EventAlarmInfo, error) {
 	rst := entity.EventAlarmInfo{}
-	err := dbobj.QueryForStruct("select id, event_type_cd, occurrence_time, device_id, device_name, device_ip, device_attribute, device_brightness, device_temperature, handle_status from event_alarm_info where delete_status = 0 and id = ?", &rst, id)
+	err := dbobj.QueryForStruct("select id, event_type_cd, occurrence_time, serial_number, device_name, device_ip, device_attribute, device_brightness, device_temperature, handle_status from event_alarm_info where delete_status = 0 and id = ?", &rst, id)
 	return rst, err
 }
 

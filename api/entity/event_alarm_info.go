@@ -4,7 +4,7 @@ type EventAlarmInfo struct {
 	Id                int
 	EventTypeCd       int
 	OccurrenceTime    string
-	DeviceId          string
+	SerialNumber      string
 	DeviceName        string
 	DeviceIp          string
 	DeviceAttribute   uint8
