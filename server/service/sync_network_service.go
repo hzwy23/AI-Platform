@@ -41,7 +41,7 @@ func removeOfflineDevice()  {
 
 type DeviceInfo struct {
 	// 设别序列号
-	SerialNumber string `json: "client_CPUID""`
+	SerialNumber string `json: "client_CPUID"`
 	// 软件版本号
 	FirmwareVersion string `json:"client_FrameworkVersion"`
 	// 设备IP地址
