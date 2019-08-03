@@ -33,7 +33,6 @@ func (r *DeviceLoggerController)Get(resp http.ResponseWriter, req *http.Request)
 	data := make(map[string]interface{})
 	data["total"] = total
 	data["content"] = rst
-
 	hret.Success(resp, data)
 }
 

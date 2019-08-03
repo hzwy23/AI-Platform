@@ -3,6 +3,7 @@ package dao
 import (
 	"ai-platform/api/entity"
 	"ai-platform/dbobj"
+	"fmt"
 )
 
 type PlatDeviceLoggerDao interface {
@@ -26,15 +27,18 @@ func (r *platDeviceLoggerDaoImpl) Insert(item entity.PlatDeviceLogger) (int64, e
 func (r *platDeviceLoggerDaoImpl) FindAll(pageNumber int, pageSize int) ([]entity.PlatDeviceLogger, int64,  error) {
 	rst := make([]entity.PlatDeviceLogger, 0)
 
-	start := (pageNumber - 1) * pageSize
+	start := int64((pageNumber - 1) * pageSize)
 	if start < 0 {
 		start = 0
 	}
-	end := pageNumber * pageSize - 1
 
 	total := dbobj.Count("select count(*) from plat_device_logger")
+	if start > total {
+		start = 0
+	}
 
-	err := dbobj.QueryForSlice("select id, direction, biz_type, message, ret_code, ret_msg, serial_number, handle_time from plat_device_logger limit ?,?", &rst, start, end)
+	fmt.Println(start, pageSize)
+	err := dbobj.QueryForSlice("select id, direction, biz_type, message, ret_code, ret_msg, serial_number, handle_time from plat_device_logger order by id desc limit ?,?", &rst, start, pageSize)
 
 	return rst, total, err
 }
