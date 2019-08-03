@@ -13,9 +13,14 @@ type EventAlarmInfoDao interface {
 	CloseById(status int, id int) (int64, error)
 	Insert(item entity.EventAlarmInfo) (int64, error)
 	Update(item entity.EventAlarmInfo) (int64, error)
+	ChangeHandleStatus(serialNumber string, eventTypeId int)
 }
 
 type eventAlarmInfoDaoImpl struct {
+}
+
+func (r *eventAlarmInfoDaoImpl) ChangeHandleStatus(serialNumber string, eventTypeId int) {
+	dbobj.Exec("update event_alarm_info set handle_status = 1 where serial_number = ? and event_type_cd = ? and delete_status = 0", serialNumber, eventTypeId)
 }
 
 func (r *eventAlarmInfoDaoImpl) Insert(item entity.EventAlarmInfo) (int64, error) {

@@ -110,6 +110,10 @@ func broadcast(context *platform.Context) (int, string){
 		}
 		lock.Lock()
 		deviceScan[bd.SerialNumber] = online
+		// 设备上线
+		dbobj.Exec("update device_manage_info set device_status = 1 where serial_number = ? and delete_status = 0", bd.SerialNumber)
+		// 取消告警
+		alarm.ChangeHandleStatus(bd.SerialNumber, 2)
 		lock.Unlock()
 	}
 	return 200, "Ok"
