@@ -4,6 +4,7 @@ import (
 	"ai-platform/panda/logger"
 	"ai-platform/server/platform"
 	"encoding/json"
+	"fmt"
 	"sync"
 	"time"
 )
@@ -40,22 +41,27 @@ func removeOfflineDevice()  {
 
 type DeviceInfo struct {
 	// 设别序列号
-	SerialNumber string
+	SerialNumber string `json: "client_CPUID""`
 	// 软件版本号
 	FirmwareVersion string
 	// 设备IP地址
-	DeviceIp string
+	DeviceIp string `json:"client_IP"`
 	// 设备掩码
-	Mask string
+	Mask string `json:"client_MASK"`
 	// 网关地址
-	GatewayAddr string
+	GatewayAddr string `json:"client_GATEWAY"`
 	// 设备端口号
-	DevicePort string
+	DevicePort string `json:"client_PORT"`
 	// 设备mac地址
-	MacAddr string
+	MacAddr string `json:"client_MAC"`
 }
 
 func broadcast(context *platform.Context) (int, string){
+	defer func() {
+		if r := recover(); r != nil {
+			fmt.Println(r)
+		}
+	}()
 	bd := &DeviceInfo{}
 	err := json.Unmarshal(context.GetMessage().MsgBody, bd)
 	if err == nil {
