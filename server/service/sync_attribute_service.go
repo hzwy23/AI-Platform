@@ -45,8 +45,19 @@ func asyncAttribute(context *platform.Context) (int, string){
 		return 0, err.Error()
 	}
 
+	attr := 1
+	if data.DeviceAttribute == "Auto" {
+		attr = 4
+	} else if data.DeviceAttribute == "ON" {
+		attr = 1
+	} else if data.DeviceAttribute == "OFF" {
+		attr = 2
+	} else if data.DeviceAttribute == "Flash" {
+		attr = 3
+	}
+
 	dbobj.Exec("update device_manage_info set device_attribute = ?, device_power = ?, device_temperature = ?, device_light_threshold = ?, device_brightness = ?, power_total = ?, strobe_count = ? where serial_number = ? and delete_status = 0",
-		data.DeviceAttribute, data.DevicePower, data.DeviceTemperature, data.DeviceLightThreshold, data.DeviceBrightness, data.PowerTotal, data.StrobeCount, data.SerialNumber)
+		attr, data.DevicePower, data.DeviceTemperature, data.DeviceLightThreshold, data.DeviceBrightness, data.PowerTotal, data.StrobeCount, data.SerialNumber)
 	context.Send(0x0001, context.GetMessage().MsgBody)
 	return 200,"OK"
 }
