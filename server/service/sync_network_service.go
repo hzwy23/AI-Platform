@@ -48,7 +48,7 @@ func removeOfflineDevice()  {
 				DeviceIp:          "-",
 				DeviceAttribute:   0,
 				DeviceBrightness:  0,
-				DeviceTemperature: 0,
+				DeviceTemperature: "0",
 				HandleStatus:      0,
 				DeleteStatus:      0,
 			}

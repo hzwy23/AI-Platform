@@ -9,7 +9,7 @@ type EventAlarmInfo struct {
 	DeviceIp          string
 	DeviceAttribute   uint8
 	DeviceBrightness  uint8
-	DeviceTemperature uint8
+	DeviceTemperature string
 	HandleStatus      uint8
 	DeleteStatus      uint8
 }

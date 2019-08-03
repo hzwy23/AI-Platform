@@ -23,7 +23,7 @@ type DeviceManageInfo struct {
 	// 设备亮度
 	DeviceBrightness uint8
 	// 设备温度
-	DeviceTemperature uint8
+	DeviceTemperature string
 	// 自动开启时间
 	AutoStartTime string
 	// 自动结束时间
