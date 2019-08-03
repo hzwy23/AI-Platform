@@ -3,7 +3,6 @@ package main
 import (
 	"ai-platform/panda/logger"
 	"ai-platform/protocol"
-	"encoding/json"
 	"fmt"
 	"net"
 	"time"
@@ -105,24 +104,25 @@ func getBroadcast()  {
 	}
 	defer conn.Close()
 	fmt.Println("连接成功")
-	dt := DeviceInfo{
-		// 设别序列号
-		SerialNumber: "DTP00001",
-		// 软件版本号
-		FirmwareVersion: "V0.0.1",
-		// 设备IP地址
-		DeviceIp: "192.168.1.1",
-		// 设备掩码
-		Mask:"255.255.255.0",
-		// 网关地址
-		GatewayAddr:"192.168.1.1",
-		// 设备端口号
-		DevicePort:"8070",
-		// 设备mac地址
-		MacAddr:"5f-34-54-34-54",
-	}
-	dtJson, _ := json.Marshal(dt)
-	data ,err := protocol.Pack(110, dtJson)
+	//dt := DeviceInfo{
+	//	// 设别序列号
+	//	SerialNumber: "DTP00001",
+	//	// 软件版本号
+	//	FirmwareVersion: "V0.0.1",
+	//	// 设备IP地址
+	//	DeviceIp: "192.168.1.1",
+	//	// 设备掩码
+	//	Mask:"255.255.255.0",
+	//	// 网关地址
+	//	GatewayAddr:"192.168.1.1",
+	//	// 设备端口号
+	//	DevicePort:"8070",
+	//	// 设备mac地址
+	//	MacAddr:"5f-34-54-34-54",
+	//}
+	//_, _ := json.Marshal(dt)
+
+	data ,err := protocol.Pack(1, []byte(`{"client_CDS":"2603","client_CDSThreshold":"0","client_CPUID":"36ffd9054e43383416650443","client_Consumption":"0","client_FlashCount":"0","client_LightLevel":"0","client_Mode":"Auto","client_Power":"0","client_Temp":"47.84"}`))
 	size,err:=conn.Write(data)
 	fmt.Println("write",size,err)
 }

@@ -8,11 +8,9 @@ import (
 	"fmt"
 )
 
-type deviceAttribute struct {
+type DeviceAttribute struct {
 	// 序列号
 	SerialNumber string `json:"client_CPUID"`
-	// 是否DHCP
-	DhcpFlag string `json:"client_Mode"`
 	// 功率
 	DevicePower string `json:"client_Power"`
 	// 温度
@@ -27,6 +25,11 @@ type deviceAttribute struct {
 	StrobeCount string `json:"client_FlashCount"`
 	// 光照强度
 	IntensityLight string `json:"client_CDS"`
+	// 设备属性  <Option value="1">常亮</Option>
+	//         <Option value="2">频闪</Option>
+	//         <Option value="3">爆灯</Option>
+	//         <Option value="4">自动</Option>
+	DeviceAttribute string `json:"client_Mode"`
 }
 
 func asyncAttribute(context *platform.Context) (int, string){
@@ -35,15 +38,15 @@ func asyncAttribute(context *platform.Context) (int, string){
 			fmt.Println(r)
 		}
 	}()
-	var data *deviceAttribute
-	err := json.Unmarshal(context.GetMessage().MsgBody, data)
+	var data DeviceAttribute
+	err := json.Unmarshal(context.GetMessage().MsgBody, &data)
 	if err != nil {
 		logger.Error(err)
 		return 0, err.Error()
 	}
-	fmt.Println(data)
-	dbobj.Exec("update device_manage_info set dhcp_flag = ?, device_power = ?, device_temperature = ?, device_light_threshold = ?, device_brightness = ?, power_total = ?, strobe_count = ? where serial_number = ? and delete_status = 0",
-		data.DhcpFlag, data.DevicePower, data.DeviceTemperature, data.DeviceLightThreshold, data.DeviceBrightness, data.PowerTotal, data.StrobeCount, data.SerialNumber)
+
+	dbobj.Exec("update device_manage_info set device_attribute = ?, device_power = ?, device_temperature = ?, device_light_threshold = ?, device_brightness = ?, power_total = ?, strobe_count = ? where serial_number = ? and delete_status = 0",
+		data.DeviceAttribute, data.DevicePower, data.DeviceTemperature, data.DeviceLightThreshold, data.DeviceBrightness, data.PowerTotal, data.StrobeCount, data.SerialNumber)
 	context.Send(0x0001, context.GetMessage().MsgBody)
 	return 200,"OK"
 }
