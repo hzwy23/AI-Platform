@@ -6,26 +6,27 @@ import (
 )
 
 type PlatUserLoggerDao interface {
-	FindAll(pageNumber int, pageSize int) ([]entity.PlatUserLogger, error)
+	FindAll(pageNumber int, pageSize int) ([]entity.PlatUserLogger, int64, error)
 	Insert(item entity.PlatUserLogger) (int64, error)
 }
 
 type platUserLoggerDaoImpl struct {
 }
 
-func (r *platUserLoggerDaoImpl) FindAll(pageNumber int, pageSize int) ([]entity.PlatUserLogger, error) {
+func (r *platUserLoggerDaoImpl) FindAll(pageNumber int, pageSize int) ([]entity.PlatUserLogger, int64, error) {
 	rst := make([]entity.PlatUserLogger, 0)
-	if pageNumber > 0 {
-		pageNumber -= 1
-	} else {
-		pageNumber = 0
-		pageSize = 10
+	start := int64((pageNumber - 1) * pageSize)
+	if start < 0 {
+		start = 0
 	}
-	start := pageNumber * pageSize
-	end := (pageNumber + 1) * pageSize
 
-	err := dbobj.QueryForSlice("select id, user_id, handle_time, req_method, req_url, req_param, ret_msg, ret_code from plat_user_logger limit ?,?", &rst, start, end)
-	return rst, err
+	total := dbobj.Count("select count(*) from plat_user_logger")
+	if start > total {
+		start = 0
+	}
+
+	err := dbobj.QueryForSlice("select id, user_id, handle_time, req_method, req_url, req_param, ret_msg, ret_code from plat_user_logger order by id desc limit ?,?", &rst, start, pageSize)
+	return rst, total, err
 }
 
 func (r *platUserLoggerDaoImpl) Insert(item entity.PlatUserLogger) (int64, error) {

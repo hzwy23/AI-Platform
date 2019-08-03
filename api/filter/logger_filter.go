@@ -3,6 +3,7 @@ package filter
 import (
 	"ai-platform/api/dao"
 	"ai-platform/api/entity"
+	"ai-platform/panda"
 	"ai-platform/panda/hret"
 	"ai-platform/panda/jwt"
 	"ai-platform/panda/route"
@@ -38,6 +39,7 @@ func writeHandleLogs(w http.ResponseWriter, r *http.Request) {
 		one.ReqUrl = r.URL.Path
 		one.ReqParam = formencode(r.Form)
 		one.ReqMethod = r.Method
+		one.HandleTime = panda.CurTime()
 
 		claim, err := jwt.ParseHttp(r)
 		if err != nil {
