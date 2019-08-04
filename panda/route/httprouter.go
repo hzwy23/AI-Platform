@@ -66,7 +66,7 @@ func PUT(path string, handle httprouter.Handle) {
 
 // 设置静态文件路由，如path是/s，root是./static，则static目录下边的静态文件style.css，访问地址是：/s/style.css
 func ServeFiles(url string, root http.FileSystem) {
-	defaultHttprouter.ServeFiles(path.Join(url, "*filepath"), root)
+	defaultHttprouter.ServeFiles(path.Join("/ui/", "*filepath"), root)
 }
 
 func RESTful(path string, c ControllerHandle) {

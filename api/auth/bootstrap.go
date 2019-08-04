@@ -56,7 +56,7 @@ func Bootstrap() {
 	loggerFilter := &filter.LoggerFilter{}
 
 	// 注册静态路由
-	route.ServeFiles("/static", http.Dir("./static"))
+	route.ServeFiles("/ui", http.Dir("./webui"))
 
 	// 创建中间件
 	middle := route.NewMiddleware(authFilter, loggerFilter, route.Wrap(route.DefaultRouter()))
