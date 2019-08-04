@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"encoding/binary"
 	"errors"
+	"io"
 	"net"
 	"sync"
 	"time"
@@ -87,7 +88,7 @@ func (r *JTTProtocol) Send(msgId uint16, msgData []byte) (int, error) {
 // 读取数据
 func (r *JTTProtocol) Parse() ([]byte, error) {
 	if msg, ok := r.parse(); ok {
-		logger.Info("receive message is:", msg)
+		logger.Debug("receive message is:", msg)
 		return msg, nil
 	}
 	r.closeLock.RLock()
@@ -158,8 +159,8 @@ func (r *JTTProtocol) read() {
 	for {
 		tmp := make([]byte, 256)
 		size, err := r.conn.Read(tmp)
-		if err != nil {
-			logger.Error("读取socket内容失败，失败原因是：", err)
+		if err == io.EOF {
+			logger.Info("连接已断开：", err)
 			r.closeLock.Lock()
 			r.isClosed = true
 			r.closeLock.Unlock()

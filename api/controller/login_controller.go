@@ -22,11 +22,11 @@ func (login *LoginController) Post(w http.ResponseWriter, r *http.Request) {
 	pd := ""
 	err := dbobj.QueryForObject("select password from sys_user_info where user_id = ?", dbobj.PackArgs(username), &pd)
 	if err != nil {
-		hret.Error(w, 403,"用户不存在")
+		hret.Error(w, 403, "用户不存在")
 		return
 	}
 	if password != pd {
-		hret.Error(w,401,"用户密码错误，请重新输入")
+		hret.Error(w, 401, "用户密码错误，请重新输入")
 		return
 	}
 

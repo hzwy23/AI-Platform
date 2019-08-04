@@ -5,6 +5,7 @@ import (
 	"ai-platform/api/entity"
 	"ai-platform/dbobj"
 	"ai-platform/panda"
+	"ai-platform/panda/hret"
 	"ai-platform/panda/logger"
 	"ai-platform/server/platform"
 	"encoding/json"
@@ -15,66 +16,12 @@ import (
 
 
 type onlineDevice struct {
+	// 设备号
 	SerialNumber string
 	// 最近刷新的时间戳
-	RefreshTime time.Time
+	RefreshTime int64
+	// 设备信息
 	*DeviceInfo
-}
-
-var deviceScan = make(map[string]*onlineDevice, 0)
-var lock = &sync.RWMutex{}
-var alarm dao.EventAlarmInfoDao
-var device dao.DeviceManageInfoDao
-
-func GetOnlineDevice() map[string]*onlineDevice {
-	lock.RLock()
-	defer lock.RUnlock()
-	return deviceScan
-}
-
-func removeOfflineDevice()  {
-	for key, val := range deviceScan {
-		d,_:=time.ParseDuration("30s")
-		if time.Now().After(val.RefreshTime.Add(d)) {
-			logger.Info("从设备扫描列表中删除设备", key)
-			lock.Lock()
-			delete(deviceScan, key)
-			dbobj.Exec("update device_manage_info set device_status = 4 where serial_number = ? and delete_status = 0", key)
-			item := entity.EventAlarmInfo{
-				EventTypeCd:       2,
-				OccurrenceTime:    panda.CurTime(),
-				SerialNumber:      key,
-				DeviceName:        "设备不存在",
-				DeviceIp:          "-",
-				DeviceAttribute:   0,
-				DeviceBrightness:  0,
-				DeviceTemperature: "0",
-				HandleStatus:      0,
-				DeleteStatus:      0,
-			}
-			// todo 生成离线异常信息
-			element, err := device.FindBySerialNumber(key)
-			if err != nil {
-				fmt.Println(err)
-			} else {
-				item = entity.EventAlarmInfo{
-					EventTypeCd:       2,
-					OccurrenceTime:    panda.CurTime(),
-					SerialNumber:      key,
-					DeviceName:        element.DeviceName,
-					DeviceIp:          element.DeviceIp,
-					DeviceAttribute:   element.DeviceAttribute,
-					DeviceBrightness:  element.DeviceBrightness,
-					DeviceTemperature: element.DeviceTemperature,
-					HandleStatus:      0,
-					DeleteStatus:      0,
-				}
-			}
-			alarm.Insert(item)
-			lock.Unlock()
-		}
-
-	}
 }
 
 type DeviceInfo struct {
@@ -94,41 +41,100 @@ type DeviceInfo struct {
 	MacAddr string `json:"client_MAC"`
 }
 
-func broadcast(context *platform.Context) (int, string){
-	defer func() {
-		if r := recover(); r != nil {
-			fmt.Println(r)
+var deviceScan = make(map[string]*onlineDevice, 0)
+var lock = &sync.RWMutex{}
+var alarm dao.EventAlarmInfoDao
+var device dao.DeviceManageInfoDao
+
+func GetOnlineDevice() map[string]*onlineDevice {
+	lock.RLock()
+	defer lock.RUnlock()
+	return deviceScan
+}
+
+// 定时清理离线设备，并发送告警信息
+func removeOfflineDevice()  {
+	// 如果程序异常退出，重新拉起
+	defer hret.RecvPanic(removeOfflineDevice)
+
+	for {
+		for key, val := range deviceScan {
+			// 设备持续掉线30s将会判定为设备离线
+			duration := time.Now().Unix() - val.RefreshTime
+			if duration > 30 {
+				logger.Info("从设备扫描列表中删除设备", key)
+				lock.Lock()
+				delete(deviceScan, key)
+				lock.Unlock()
+				element, err := device.FindBySerialNumber(key)
+				if err != nil {
+					fmt.Println(err)
+					continue
+				} else if len(element.SerialNumber) == 0{
+					continue
+				}
+
+				dbobj.Exec("update device_manage_info set device_status = 4 where serial_number = ? and delete_status = 0", key)
+				item := entity.EventAlarmInfo{
+					EventTypeCd:       2,
+					OccurrenceTime:    panda.CurTime(),
+					SerialNumber:      key,
+					DeviceName:        element.DeviceName,
+					DeviceIp:          element.DeviceIp,
+					DeviceAttribute:   element.DeviceAttribute,
+					DeviceBrightness:  element.DeviceBrightness,
+					DeviceTemperature: element.DeviceTemperature,
+					HandleStatus:      0,
+					DeleteStatus:      0,
+				}
+				alarm.Insert(item)
+			}
+
 		}
-	}()
+
+		time.Sleep(time.Millisecond*500)
+		logger.Debug("delete offline device")
+	}
+}
+
+// 接收广播消息
+func broadcast(context *platform.Context) (int, string){
+	defer hret.RecvPanic()
+
 	bd := &DeviceInfo{}
 	err := json.Unmarshal(context.GetMessage().MsgBody, bd)
 	if err == nil {
+		start := time.Now().Unix()
 		online := &onlineDevice{
 			bd.SerialNumber,
-			time.Now(),
+			start,
 			bd,
 		}
 		lock.Lock()
 		deviceScan[bd.SerialNumber] = online
+		lock.Unlock()
+
 		// 设备上线
 		dbobj.Exec("update device_manage_info set device_status = 1 where serial_number = ? and delete_status = 0", bd.SerialNumber)
+
 		// 取消告警
 		alarm.ChangeHandleStatus(bd.SerialNumber, 2)
-		lock.Unlock()
+
+	} else {
+		fmt.Println(err.Error())
+		return 50030, err.Error()
 	}
 	return 200, "Ok"
 }
 
 func init() {
+
 	alarm = dao.NewEventAlarmInfoDao()
+
 	device = dao.NewDeviceManageInfoDao()
 
 	platform.Register(0x0000, broadcast)
-	go func() {
-		for {
-			removeOfflineDevice()
-			time.Sleep(time.Millisecond*500)
-			logger.Info("delete offline device")
-		}
-	}()
+
+	go removeOfflineDevice()
+
 }

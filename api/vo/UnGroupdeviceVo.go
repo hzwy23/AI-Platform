@@ -1,10 +1,10 @@
 package vo
 
 type UnGroupDeviceVo struct {
-	DeviceId string
+	DeviceId     string
 	SerialNumber string
-	DeviceName string
-	DeviceIp string
-	DevicePort string
-	GroupId int
+	DeviceName   string
+	DeviceIp     string
+	DevicePort   string
+	GroupId      int
 }

@@ -12,7 +12,7 @@ type PlatUserLoggerController struct {
 	dao dao.PlatUserLoggerDao
 }
 
-func (r *PlatUserLoggerController)Get(resp http.ResponseWriter, req *http.Request)  {
+func (r *PlatUserLoggerController) Get(resp http.ResponseWriter, req *http.Request) {
 	req.ParseForm()
 	pageNumber := req.FormValue("pageNumber")
 	pageSize := req.FormValue("pageSize")
@@ -36,9 +36,9 @@ func (r *PlatUserLoggerController)Get(resp http.ResponseWriter, req *http.Reques
 	hret.Success(resp, data)
 }
 
-func init(){
+func init() {
 	ctl := &PlatUserLoggerController{
 		dao: dao.NewPlatUserLoggerDao(),
 	}
-	route.Handler("GET","/api/platform/logger", ctl.Get)
+	route.Handler("GET", "/api/platform/logger", ctl.Get)
 }

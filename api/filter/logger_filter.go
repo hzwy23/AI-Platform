@@ -18,8 +18,8 @@ type LoggerFilter struct {
 }
 
 func (log *LoggerFilter) ServeHTTP(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
-	next(w, r)
 	go writeHandleLogs(w, r)
+	next(w, r)
 }
 
 func init() {

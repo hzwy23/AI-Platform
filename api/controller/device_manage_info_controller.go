@@ -79,7 +79,7 @@ func (r *DeviceManageInfoController) Post(resp http.ResponseWriter, req *http.Re
 		// 设备IP
 		DeviceIp: req.FormValue("DeviceIp"),
 		// 设备服务端口
-		DevicePort:   req.FormValue("DevicePort"),
+		DevicePort: req.FormValue("DevicePort"),
 
 		DeviceStatus: 1,
 		// 设备属性
@@ -147,10 +147,10 @@ func (r *DeviceManageInfoController) RemoveFromGroup(resp http.ResponseWriter, r
 
 // 查询所有没有分组的设备
 func (r *DeviceManageInfoController) GetUnGroupDevice(resp http.ResponseWriter, req *http.Request) {
-	rst := make([]vo.UnGroupDeviceVo,0)
+	rst := make([]vo.UnGroupDeviceVo, 0)
 	err := dbobj.QueryForSlice(sqlText, &rst)
 	if err != nil {
-		hret.Error(resp, 500300,"查询未分组设备失败")
+		hret.Error(resp, 500300, "查询未分组设备失败")
 		return
 	}
 	hret.Success(resp, rst)
@@ -159,16 +159,16 @@ func (r *DeviceManageInfoController) GetUnGroupDevice(resp http.ResponseWriter, 
 func (r *DeviceManageInfoController) UpdateDeviceGroup(resp http.ResponseWriter, req *http.Request) {
 	req.ParseForm()
 
-	body, err:=ioutil.ReadAll(req.Body)
+	body, err := ioutil.ReadAll(req.Body)
 	if err != nil {
-		hret.Error(resp,500030, "添加设备失败，参数为空")
+		hret.Error(resp, 500030, "添加设备失败，参数为空")
 		return
 	}
-	args := make([]*vo.UnGroupDeviceVo,0)
-	err = json.Unmarshal(body,&args)
+	args := make([]*vo.UnGroupDeviceVo, 0)
+	err = json.Unmarshal(body, &args)
 	if err != nil {
 		fmt.Println(err)
-		hret.Error(resp,500031, "添加设备失败，参数解析失败")
+		hret.Error(resp, 500031, "添加设备失败，参数解析失败")
 		return
 	}
 	claim, err := jwt.ParseHttp(req)
@@ -178,7 +178,7 @@ func (r *DeviceManageInfoController) UpdateDeviceGroup(resp http.ResponseWriter,
 		return
 	}
 
-	tx,_ := dbobj.Begin()
+	tx, _ := dbobj.Begin()
 	for _, item := range args {
 		result, err := tx.Exec("insert into group_device_bind(group_id, device_id, create_by, create_date, update_by, update_date, delete_status) values(?,?,?,?,?,?,0)",
 			item.GroupId, item.DeviceId, claim.UserId, panda.CurTime(), claim.UserId, panda.CurTime())
@@ -194,10 +194,10 @@ func (r *DeviceManageInfoController) UpdateDeviceGroup(resp http.ResponseWriter,
 		}
 	}
 	tx.Commit()
-	hret.Success(resp,"Success")
+	hret.Success(resp, "Success")
 }
 
-func (r *DeviceManageInfoController) ChangeGroup(resp http.ResponseWriter, req *http.Request)  {
+func (r *DeviceManageInfoController) ChangeGroup(resp http.ResponseWriter, req *http.Request) {
 	req.ParseForm()
 	deviceId := req.FormValue("DeviceId")
 	groupId := req.FormValue("GroupId")
@@ -211,7 +211,7 @@ func (r *DeviceManageInfoController) ChangeGroup(resp http.ResponseWriter, req *
 	dbobj.Exec("update group_device_bind set delete_status = 1 where device_id = ?", deviceId)
 	dbobj.Exec("insert into group_device_bind(group_id, device_id, create_by, create_date, update_by, update_date, delete_status) values(?,?,?,?,?,?,0)",
 		groupId, deviceId, claim.UserId, panda.CurTime(), claim.UserId, panda.CurTime())
-	hret.Success(resp,"Success")
+	hret.Success(resp, "Success")
 }
 
 func init() {
@@ -223,7 +223,7 @@ func init() {
 	route.Handler("POST", "/api/device/manage", ctl.Post)
 	route.Handler("POST", "/api/device/manage/group", ctl.UpdateDeviceGroup)
 	route.Handler("PUT", "/api/device/manage", ctl.Put)
-	route.Handler("PUT","/api/device/group/change", ctl.ChangeGroup)
+	route.Handler("PUT", "/api/device/group/change", ctl.ChangeGroup)
 	route.DELETE("/api/device/manage/:deviceId", ctl.Delete)
 	route.DELETE("/api/device/bind/:id", ctl.RemoveFromGroup)
 }

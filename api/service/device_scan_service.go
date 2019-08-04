@@ -22,7 +22,7 @@ func (r *deviceScanServiceImpl) FindAll() ([]entity.DeviceScan, int, error) {
 	for _, val := range ret {
 
 		address := ""
-		dbobj.QueryForObject("select device_address from device_install_info where delete_status = 0 and serial_number = ?",dbobj.PackArgs(val.SerialNumber),&address)
+		dbobj.QueryForObject("select device_address from device_install_info where delete_status = 0 and serial_number = ?", dbobj.PackArgs(val.SerialNumber), &address)
 
 		item := entity.DeviceScan{
 			// 设别序列号

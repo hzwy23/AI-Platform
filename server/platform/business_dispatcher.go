@@ -39,7 +39,7 @@ func (r *BusinessDispatcher) dispatcher(context *Context) (int, string){
 	if handler, ok := r.msgIdHandler[context.GetMsgId()]; ok {
 		return handler(context)
 	} else {
-		logger.Error("无效的业务类型, 业务类型是：", context.GetMsgId())
+		logger.Warn("无效的业务类型, 业务类型是：", context.GetMsgId())
 		return 500, "无效的业务类型"
 	}
 }
@@ -69,7 +69,7 @@ func dispatcher(context *Context) {
 			var rst interface{}
 			json.Unmarshal(msg, &rst)
 			body := rst.(map[string]interface{})
-			logger.Info("报文内容是：",rst)
+			logger.Debug("报文内容是：",rst)
 			bodyStr,_ := json.Marshal(body)
 			result, err := dbobj.Exec("insert into plat_device_logger(serial_number, handle_time, direction, biz_type, message, ret_code, ret_msg) values(?, ?, ?, ?, ?, ?, ?)",
 				body["client_CPUID"], panda.CurTime(), "Input", msgId, bodyStr, code, retMsg)

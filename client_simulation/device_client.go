@@ -122,7 +122,7 @@ func getBroadcast()  {
 	//}
 	//_, _ := json.Marshal(dt)
 
-	data ,err := protocol.Pack(1, []byte(`{"client_CDS":"2603","client_CDSThreshold":"0","client_CPUID":"36ffd9054e43383416650443","client_Consumption":"0","client_FlashCount":"0","client_LightLevel":"0","client_Mode":"Auto","client_Power":"0","client_Temp":"47.84"}`))
+	data ,err := protocol.Pack(0, []byte(`{"client_IP":"192.168.2.100","client_PORT":"8989","client_CPUID":"1111111111111111","client_FrameworkVersion":"1.2.3","client_GATEWAY":"192.168.2.1","client_MAC":"01-df-de-sa-df","client_Mode":"Auto","client_MASK":"255.255.255.0","client_Temp":"47.84"}`))
 	size,err:=conn.Write(data)
 	fmt.Println("write",size,err)
 }
@@ -144,7 +144,7 @@ func main() {
 	go func() {
 		for {
 			getBroadcast()
-			time.Sleep(time.Millisecond*100)
+			time.Sleep(time.Millisecond*2000)
 		}
 	}()
 	for {

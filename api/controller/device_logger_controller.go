@@ -12,7 +12,7 @@ type DeviceLoggerController struct {
 	dao dao.PlatDeviceLoggerDao
 }
 
-func (r *DeviceLoggerController)Get(resp http.ResponseWriter, req *http.Request)  {
+func (r *DeviceLoggerController) Get(resp http.ResponseWriter, req *http.Request) {
 	req.ParseForm()
 	pageNumber := req.FormValue("pageNumber")
 	pageSize := req.FormValue("pageSize")
@@ -24,7 +24,7 @@ func (r *DeviceLoggerController)Get(resp http.ResponseWriter, req *http.Request)
 	if err != nil {
 		size = 10
 	}
-	rst, total, err:=r.dao.FindAll(page, size)
+	rst, total, err := r.dao.FindAll(page, size)
 	if err != nil {
 		hret.Error(resp, 500030, err.Error())
 		return
@@ -36,7 +36,7 @@ func (r *DeviceLoggerController)Get(resp http.ResponseWriter, req *http.Request)
 	hret.Success(resp, data)
 }
 
-func init()  {
+func init() {
 	ctl := &DeviceLoggerController{
 		dao: dao.NewPlatDeviceLoggerDao(),
 	}

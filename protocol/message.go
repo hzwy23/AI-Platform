@@ -50,6 +50,6 @@ func ConvertToByte(message *Message) []byte {
 	binary.Write(sbuf, binary.BigEndian, message.MsgHeader)
 	sb := sbuf.Bytes()
 	result := append(sb, eb...)
-	logger.Info("发送：", result)
+	logger.Debug("发送：", result)
 	return result
 }

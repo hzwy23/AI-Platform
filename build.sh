@@ -1,5 +1,4 @@
 #!/bin/bash
-echo $1
 
 function clean_application() {
   echo "清除历史安装包"
@@ -15,6 +14,24 @@ function pack_application(){
 function copy_static() {
   cp -r ./conf ./application/
 	cp -r ./webui ./application/
+}
+
+function window() {
+  echo "编译windows平台软件"
+	GOOS=windows GOARCH=amd64 go build -o windows_start.exe main.go
+	pack_application "windows_start.exe"
+}
+
+function macos() {
+  GOOS=darwin GOARCH=amd64 go build -o macos_start main.go
+	pack_application "macos_start"
+}
+
+function linux() {
+  echo "编译$1平台软件"
+	GOOS=linux GOARCH=amd64 go build -o linux_start main.go
+		pack_application "linux_start"
+
 }
 
 case $1 in
@@ -33,7 +50,7 @@ case $1 in
     linux
     copy_static
     ;;
-  "*")
+  *)
     clean_application
     window
     macos
@@ -41,22 +58,3 @@ case $1 in
     copy_static
     ;;
 esac
-
-function window() {
-  echo "编译windows平台软件"
-	GOOS=windows GOARCH=amd64 go build -o windows_start.exe main.go
-	pack_application "windows_start"
-}
-
-function macos() {
-  GOOS=darwin GOARCH=amd64 go build -o macos_start main.go
-	pack_application "macos_start"
-}
-
-function linux() {
-  echo "编译$1平台软件"
-	GOOS=linux GOARCH=amd64 go build -o linux_start main.go
-		pack_application "linux_start"
-
-}
-

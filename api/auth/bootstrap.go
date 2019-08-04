@@ -59,7 +59,7 @@ func Bootstrap() {
 	route.ServeFiles("/ui", http.Dir("./webui"))
 
 	// 创建中间件
-	middle := route.NewMiddleware(authFilter, loggerFilter, route.Wrap(route.DefaultRouter()))
+	middle := route.NewMiddleware(authFilter, route.Wrap(route.DefaultRouter()), loggerFilter)
 
 	// 启动服务
 	// 从配置文件获取端口号

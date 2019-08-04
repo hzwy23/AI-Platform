@@ -83,7 +83,7 @@ func (r *defaultPlatformServer) udpServer(conn *net.UDPConn) {
 			time.Sleep(time.Millisecond * 100)
 			continue
 		}
-		logger.Info("receive message is: ", message)
+		logger.Debug("receive message is: ", message)
 		context, err := NewContext(protoService, message)
 		if err != nil {
 			continue

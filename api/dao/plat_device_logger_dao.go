@@ -23,7 +23,7 @@ func (r *platDeviceLoggerDaoImpl) Insert(item entity.PlatDeviceLogger) (int64, e
 	return size, err
 }
 
-func (r *platDeviceLoggerDaoImpl) FindAll(pageNumber int, pageSize int) ([]entity.PlatDeviceLogger, int64,  error) {
+func (r *platDeviceLoggerDaoImpl) FindAll(pageNumber int, pageSize int) ([]entity.PlatDeviceLogger, int64, error) {
 	rst := make([]entity.PlatDeviceLogger, 0)
 
 	start := int64((pageNumber - 1) * pageSize)

@@ -2,19 +2,21 @@ package controller
 
 import (
 	"ai-platform/panda/route"
-	"fmt"
+	"html/template"
 	"net/http"
 )
 
 type indexController struct {
-
 }
 
-func (r *indexController)Index(resp http.ResponseWriter, req *http.Request, params route.Params)  {
-	fmt.Println(params, req.RequestURI)
+// 处理前端路由，前端刷新时，必须获取index.html内容
+func (r *indexController) Index(resp http.ResponseWriter, req *http.Request, params route.Params) {
+	t, _ := template.ParseFiles("./webui/index.html")
+	t.Execute(resp, nil)
 }
 
-func init()  {
-	ctl := &indexController{}
+func init() {
+	ctl := indexController{}
+	route.GET("/index.html", ctl.Index)
 	route.GET("/", ctl.Index)
 }

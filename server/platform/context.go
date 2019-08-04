@@ -23,7 +23,7 @@ func NewContext(protoService protocol.CommunicationService, data []byte) (*Conte
 		logger.Error("异常数据格式：", data)
 		return nil, errors.New("返回消息格式不不正确")
 	}
-	logger.Info("convert message is: ", *msg)
+	logger.Debug("convert message is: ", *msg)
 	r := &Context{
 		message:      msg,
 		protoService: protoService,

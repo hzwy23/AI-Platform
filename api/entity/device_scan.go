@@ -17,7 +17,6 @@ type DeviceScan struct {
 	MacAddr string
 	// 是否添加
 	IsAdded bool
-
 	// 安装位置
 	DeviceAddress string
 }
