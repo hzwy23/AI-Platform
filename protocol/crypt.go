@@ -1,11 +1,11 @@
 package protocol
 
-// 加密算法
+// Encrypt 加密算法
 func Encrypt(key uint32, data []byte) []byte {
 	return crypt(key, data)
 }
 
-// 解密算法
+// Decrypt 解密算法
 func Decrypt(key uint32, data []byte) []byte {
 	return crypt(key, data)
 }

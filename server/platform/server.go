@@ -8,6 +8,7 @@ import (
 	"time"
 )
 
+// Server 服务
 type Server interface {
 	Start()
 }
@@ -18,6 +19,7 @@ type defaultPlatformServer struct {
 	protocol string
 }
 
+// NewDefaultPlatformServer 创建TCP服务
 func NewDefaultPlatformServer(ip string, port int, protocol string) Server {
 	r := new(defaultPlatformServer)
 	r.ip = ip
@@ -26,7 +28,8 @@ func NewDefaultPlatformServer(ip string, port int, protocol string) Server {
 	return r
 }
 
-func UDP(conn *net.UDPConn) {
+// NewUDPPlatformServer 创建UDP服务
+func NewUDPPlatformServer(conn *net.UDPConn) {
 	udp := defaultPlatformServer{}
 	udp.udpServer(conn)
 }
@@ -45,11 +48,11 @@ func (r *defaultPlatformServer) Start() {
 		}
 		// 有请求到达后，开启协程处理
 		logger.Info("客户端发起请求，客户端IP地址是：", conn.RemoteAddr())
-		go r.server(conn)
+		go r.tcpServer(conn)
 	}
 }
 
-func (r *defaultPlatformServer) server(conn net.Conn) {
+func (r *defaultPlatformServer) tcpServer(conn net.Conn) {
 	protoService := protocol.NewJTTProtocol(conn)
 	for {
 		message, err := protoService.Parse()

@@ -5,7 +5,7 @@ import (
 	"encoding/binary"
 )
 
-// 数据协议头
+// Header 数据协议头
 type Header struct {
 	// 报文总长度
 	MsgLength uint32

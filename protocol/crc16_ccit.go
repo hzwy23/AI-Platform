@@ -3,7 +3,7 @@ package protocol
 
 import "fmt"
 
-// CRC16-CCITTT校验
+// CRC16CCITT 校验CRC值
 func CRC16CCITT(data []byte) (uint16, string) {
 	// initial value
 	crc := 0x0000

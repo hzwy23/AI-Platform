@@ -98,7 +98,7 @@ func Broadcast(ip string, port string) {
 	logger.Info("开启广播服务, broadcast ip is:", ip, ", port is:",port)
 	fmt.Println("开启广播服务, broadcast ip is:", ip, ", port is:",port)
 	for {
-		platform.UDP(conn)
+		platform.NewUDPPlatformServer(conn)
 		time.Sleep(time.Millisecond * 50)
 	}
 }
