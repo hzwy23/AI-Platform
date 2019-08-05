@@ -1,6 +1,7 @@
 package protocol
 
 import (
+	"ai-platform/panda/hret"
 	"ai-platform/panda/logger"
 	"bytes"
 	"encoding/binary"
@@ -58,7 +59,6 @@ func ConvertToByte(message *Message) []byte {
 	logger.Debug("发送：", result)
 	return result
 }
-
 
 // UnPack 解包
 func UnPack(msgData []byte) ([]byte, error) {
@@ -195,7 +195,7 @@ func check(realMsg []byte) (uint32, bool) {
 
 	if uint32(len(realMsg)) == size {
 		return size, true
-	} 
+	}
 
 	logger.Warn("报文字节字节数不一致。", realMsg)
 	return 0, false
@@ -222,7 +222,8 @@ func decrypt(realMsg []byte, size uint32) []byte {
 	return realMsg
 }
 
-func transfer(message []byte) ([]byte, bool){
+func transfer(message []byte) ([]byte, bool) {
+	defer hret.RecvPanic()
 	// 转义
 	realMsg := unpackescapse(message)
 	// 检查长度

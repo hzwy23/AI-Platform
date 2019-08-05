@@ -14,7 +14,6 @@ import (
 	"time"
 )
 
-
 type onlineDevice struct {
 	// 设备号
 	SerialNumber string
@@ -53,7 +52,7 @@ func GetOnlineDevice() map[string]*onlineDevice {
 }
 
 // 定时清理离线设备，并发送告警信息
-func removeOfflineDevice()  {
+func removeOfflineDevice() {
 	// 如果程序异常退出，重新拉起
 	defer hret.RecvPanic(removeOfflineDevice)
 
@@ -70,7 +69,7 @@ func removeOfflineDevice()  {
 				if err != nil {
 					fmt.Println(err)
 					continue
-				} else if len(element.SerialNumber) == 0{
+				} else if len(element.SerialNumber) == 0 {
 					continue
 				}
 
@@ -92,13 +91,13 @@ func removeOfflineDevice()  {
 
 		}
 
-		time.Sleep(time.Millisecond*500)
+		time.Sleep(time.Millisecond * 500)
 		logger.Debug("delete offline device")
 	}
 }
 
 // 接收广播消息
-func broadcast(context *platform.Context) (int, string){
+func broadcast(context *platform.Context) (int, string) {
 	defer hret.RecvPanic()
 
 	bd := &DeviceInfo{}

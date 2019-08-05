@@ -18,35 +18,34 @@ type MotoData struct {
 }
 
 type DeviceNetworkData struct {
-	SerialNumber string `json:"client_CPUID"`
-	DhcpFlag string `json:"client_NetworkMode"`
-	DeviceIp string `json:"client_IP"`
-	Mask string `json:"client_MASK"`
-	DevicePort string `json:"client_PORT"`
-	Gateway string `json:"client_GATEWAY"`
-	DNS string `json:"client_DNS"`
-	MacAddress string `json:"client_MAC"`
-	ServerIp string `json:"server1_IP"`
-	SERVERPort string `json:"server1_PORT"`
-	BackServerIp string `json:"server2_IP"`
-	BackServerPort string `json:"server2_PORT"`
-	ServerDomain string `json:"server_ADDR"`
+	SerialNumber    string `json:"client_CPUID"`
+	DhcpFlag        string `json:"client_NetworkMode"`
+	DeviceIp        string `json:"client_IP"`
+	Mask            string `json:"client_MASK"`
+	DevicePort      string `json:"client_PORT"`
+	Gateway         string `json:"client_GATEWAY"`
+	DNS             string `json:"client_DNS"`
+	MacAddress      string `json:"client_MAC"`
+	ServerIp        string `json:"server1_IP"`
+	SERVERPort      string `json:"server1_PORT"`
+	BackServerIp    string `json:"server2_IP"`
+	BackServerPort  string `json:"server2_PORT"`
+	ServerDomain    string `json:"server_ADDR"`
 	FirmwareVersion string `json:"client_FrameworkVersion"`
 }
 
 type DeviceAttrData struct {
-	SerialNumber string `json:"client_CPUID"`
-	DeviceAttribute string `json:"client_Mode"`
-	DeviceBrightness string `json:"client_LightLevel"`
+	SerialNumber         string `json:"client_CPUID"`
+	DeviceAttribute      string `json:"client_Mode"`
+	DeviceBrightness     string `json:"client_LightLevel"`
 	DeviceLightThreshold string `json:"client_CDSThreshold"`
 }
 
 type DeviceControlData struct {
-	SerialNumber string `json:"client_CPUID"`
-	LightMode string `json:"client_AutoFunction"`
+	SerialNumber  string `json:"client_CPUID"`
+	LightMode     string `json:"client_AutoFunction"`
 	AutoStartTime string `json:"AutoTimeStart"`
-	AutoEndTime string `json:"AutoTimeStop"`
-
+	AutoEndTime   string `json:"AutoTimeStop"`
 }
 
 type RemoteDeviceController struct {
@@ -117,9 +116,8 @@ func (r *RemoteDeviceController) Minus(resp http.ResponseWriter, req *http.Reque
 	hret.Success(resp, "Success")
 }
 
-
 // 修改网络参数
-func (r *RemoteDeviceController) UpdateNetwork(resp http.ResponseWriter, req *http.Request, params route.Params)  {
+func (r *RemoteDeviceController) UpdateNetwork(resp http.ResponseWriter, req *http.Request, params route.Params) {
 
 	req.ParseForm()
 
@@ -139,18 +137,18 @@ func (r *RemoteDeviceController) UpdateNetwork(resp http.ResponseWriter, req *ht
 
 	// 指令数据
 	cmd := DeviceNetworkData{
-		SerialNumber: serialNumber,
-		DeviceIp:req.FormValue("DeviceIp"),
-		Mask: req.FormValue("Mask"),
-		DevicePort: req.FormValue("DevicePort"),
-		Gateway: req.FormValue("GatewayAddr"),
-		MacAddress: "",
-		DNS: "",
-		ServerIp: "",
-		SERVERPort: "",
-		BackServerIp: "",
-		BackServerPort: "",
-		ServerDomain: "",
+		SerialNumber:    serialNumber,
+		DeviceIp:        req.FormValue("DeviceIp"),
+		Mask:            req.FormValue("Mask"),
+		DevicePort:      req.FormValue("DevicePort"),
+		Gateway:         req.FormValue("GatewayAddr"),
+		MacAddress:      "",
+		DNS:             "",
+		ServerIp:        "",
+		SERVERPort:      "",
+		BackServerIp:    "",
+		BackServerPort:  "",
+		ServerDomain:    "",
 		FirmwareVersion: "",
 	}
 	if req.FormValue("DhcpFlag") == "true" {
@@ -166,7 +164,6 @@ func (r *RemoteDeviceController) UpdateNetwork(resp http.ResponseWriter, req *ht
 	}
 	hret.Success(resp, "Success")
 }
-
 
 // 更新设备属性
 func (r *RemoteDeviceController) UpdateDeviceAttr(resp http.ResponseWriter, req *http.Request, params route.Params) {
@@ -204,9 +201,9 @@ func (r *RemoteDeviceController) UpdateDeviceAttr(resp http.ResponseWriter, req 
 // 更新属性
 func updateDevice(serialNumber string, form url.Values) error {
 	deviceAttr := DeviceAttrData{
-		SerialNumber: serialNumber,
-		DeviceAttribute: form.Get("DeviceAttribute"),
-		DeviceBrightness: form.Get("DeviceBrightness"),
+		SerialNumber:         serialNumber,
+		DeviceAttribute:      form.Get("DeviceAttribute"),
+		DeviceBrightness:     form.Get("DeviceBrightness"),
 		DeviceLightThreshold: form.Get("DeviceLightThreshold"),
 	}
 	body, _ := json.Marshal(deviceAttr)
@@ -221,9 +218,9 @@ func updateDevice(serialNumber string, form url.Values) error {
 func updateLightMode(serialNumber string, form url.Values) error {
 
 	cmd := DeviceControlData{
-		SerialNumber: serialNumber,
+		SerialNumber:  serialNumber,
 		AutoStartTime: form.Get("AutoStartTime"),
-		AutoEndTime: form.Get("AutoEndTime"),
+		AutoEndTime:   form.Get("AutoEndTime"),
 	}
 	LightMode := form.Get("LightMode")
 	if LightMode == "1" {
@@ -243,7 +240,7 @@ func updateLightMode(serialNumber string, form url.Values) error {
 
 func init() {
 	ctl := &RemoteDeviceController{
-		deviceDao:dao.NewDeviceManageInfoDao(),
+		deviceDao: dao.NewDeviceManageInfoDao(),
 	}
 	route.POST("/api/device/remote/control/:SerialNumber", ctl.Control)
 	route.GET("/api/device/plus/:SerialNumber", ctl.Plus)

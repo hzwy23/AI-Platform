@@ -3,12 +3,11 @@ package protocol
 import (
 	"ai-platform/panda/logger"
 	"errors"
+	"io"
 	"net"
 	"sync"
 	"time"
-	"io"
 )
-
 
 // JTTProtocol TCP JTT格式数据协议
 type JTTProtocol struct {
@@ -97,12 +96,11 @@ func (r *JTTProtocol) read() {
 		}
 		// 如果解析到message，则触发相应的处理逻辑
 		r.lock.Lock()
-		logger.Info("receive byte is: ", tmp[:size])
+		logger.Debug("receive byte is: ", tmp[:size])
 		r.buffer = append(r.buffer, tmp[:size]...)
 		r.lock.Unlock()
 	}
 }
-
 
 // 解析是否获取一个完成的报文
 func (r *JTTProtocol) parse(tmp []byte) ([]byte, bool) {
@@ -133,7 +131,7 @@ func (r *JTTProtocol) parse(tmp []byte) ([]byte, bool) {
 	// 如果获取到结束符，则处理消息
 	if endFlag {
 		r.msgLock.RLock()
-		endMsg:=r.message
+		endMsg := r.message
 		r.msgLock.RUnlock()
 		return transfer(endMsg)
 	}

@@ -2,16 +2,22 @@ package protocol
 
 import (
 	"ai-platform/panda/logger"
+	"container/list"
+	"errors"
 	"net"
 	"sync"
 	"time"
-	"errors"
 )
+
+type udpCmd struct {
+	addr    *net.UDPAddr
+	message []byte
+}
 
 // JTTUDPProtocol UDP JTT格式数据协议
 type JTTUDPProtocol struct {
-	buffer    []byte
-	message   []byte
+	buffer    map[string][]byte
+	message   *list.List
 	conn      net.Conn
 	lock      *sync.RWMutex
 	msgLock   *sync.RWMutex
@@ -19,12 +25,11 @@ type JTTUDPProtocol struct {
 	closeLock *sync.RWMutex
 }
 
-
 // NewUDPJTTProtocol 创建UDP协议
 func NewUDPJTTProtocol(conn *net.UDPConn) *JTTUDPProtocol {
 	r := &JTTUDPProtocol{
-		buffer:    make([]byte, 0),
-		message:   make([]byte, 0),
+		buffer:    make(map[string][]byte),
+		message:   list.New(),
 		conn:      conn,
 		lock:      new(sync.RWMutex),
 		msgLock:   new(sync.RWMutex),
@@ -49,13 +54,17 @@ func (r *JTTUDPProtocol) Send(msgID uint16, msgData []byte) (int, error) {
 func (r *JTTUDPProtocol) Parse() ([]byte, error) {
 	// 将buffer内容读取出去，并清空buffer
 	r.lock.Lock()
-	tmp := r.buffer
-	r.buffer = make([]byte, 0)
+	element := r.message.Front()
+	if element != nil {
+		r.message.Remove(element)
+	}
 	r.lock.Unlock()
-
-	if msg, ok := r.parse(tmp); ok {
-		logger.Debug("receive message is:", msg)
-		return msg, nil
+	if element == nil {
+		return nil, nil
+	}
+	msg, ok := element.Value.(udpCmd)
+	if ok {
+		return msg.message, nil
 	}
 	r.closeLock.RLock()
 	defer r.closeLock.RUnlock()
@@ -68,7 +77,7 @@ func (r *JTTUDPProtocol) Parse() ([]byte, error) {
 func (r *JTTUDPProtocol) readFromUDP(conn *net.UDPConn) {
 	for {
 		tmp := make([]byte, 2048)
-		size,_, err := conn.ReadFromUDP(tmp)
+		size, raddr, err := conn.ReadFromUDP(tmp)
 		if err != nil {
 			logger.Error("读取socket内容失败，失败原因是：", err)
 			r.closeLock.Lock()
@@ -81,45 +90,71 @@ func (r *JTTUDPProtocol) readFromUDP(conn *net.UDPConn) {
 			continue
 		}
 		// 如果解析到message，则触发相应的处理逻辑
-		r.lock.Lock()
 		logger.Debug("receive byte is: ", tmp[:size])
-		r.buffer = append(r.buffer, tmp[:size]...)
-		r.lock.Unlock()
+		if val, ok := r.buffer[raddr.String()]; ok {
+			ret := append(val, tmp[:size]...)
+			if msg, ok, idx := r.parse(ret); ok {
+				r.lock.Lock()
+				r.message.PushBack(udpCmd{
+					addr:    raddr,
+					message: msg,
+				})
+				if idx == len(ret) {
+					delete(r.buffer, raddr.String())
+				} else {
+					r.buffer[raddr.String()] = ret[idx+1:]
+				}
+				r.lock.Unlock()
+			} else {
+				r.buffer[raddr.String()] = ret
+			}
+		} else {
+			val = make([]byte, 0)
+			ret := append(val, tmp[:size]...)
+			if msg, ok, idx := r.parse(ret); ok {
+				r.lock.Lock()
+				r.message.PushBack(udpCmd{
+					addr:    raddr,
+					message: msg,
+				})
+				if idx == len(ret) {
+					delete(r.buffer, raddr.String())
+				} else {
+					r.buffer[raddr.String()] = ret[idx+1:]
+				}
+				r.lock.Unlock()
+			} else {
+				r.buffer[raddr.String()] = ret
+			}
+		}
 	}
 }
 
 // 解析是否获取一个完成的报文
-func (r *JTTUDPProtocol) parse(tmp []byte) ([]byte, bool) {
+func (r *JTTUDPProtocol) parse(tmp []byte) ([]byte, bool, int) {
 	endFlag := false
-
+	startFlag := false
+	cnt := 0
 	for idx, item := range tmp {
 		if item == HEADER_FLAG {
-			r.msgLock.Lock()
-			r.message = make([]byte, 0)
-			r.message = append(r.message, item)
-			r.msgLock.Unlock()
-		} else {
-			r.msgLock.Lock()
-			r.message = append(r.message, item)
-			r.msgLock.Unlock()
-		}
-		if item == FOOTER_FLAG {
+			startFlag = true
+		} else if startFlag && item == FOOTER_FLAG {
 			endFlag = true
-			if idx+1 < len(tmp) {
-				r.lock.Lock()
-				r.buffer = append(tmp[idx+1:], r.buffer...)
-				r.lock.Unlock()
-			}
+			cnt = idx
 			break
+		} else if item == FOOTER_FLAG {
+			// 删除前边的数据
+			cnt = idx
 		}
+	}
+	// 如果获取到结束符，则处理消息
+	if startFlag && endFlag {
+		r.msgLock.RLock()
+		endMsg := tmp[:cnt+1]
+		r.msgLock.RUnlock()
+		retMsg, yes := transfer(endMsg)
+		return retMsg, yes, cnt
 	}
 
-	// 如果获取到结束符，则处理消息
-	if endFlag {
-		r.msgLock.RLock()
-		endMsg:=r.message
-		r.msgLock.RUnlock()
-		return transfer(endMsg)
-	}
-	return nil, false
+	return nil, false, 0
 }

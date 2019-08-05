@@ -32,7 +32,7 @@ type DeviceAttribute struct {
 	DeviceAttribute string `json:"client_Mode"`
 }
 
-func asyncAttribute(context *platform.Context) (int, string){
+func asyncAttribute(context *platform.Context) (int, string) {
 	defer func() {
 		if r := recover(); r != nil {
 			fmt.Println(r)
@@ -59,10 +59,9 @@ func asyncAttribute(context *platform.Context) (int, string){
 	dbobj.Exec("update device_manage_info set device_attribute = ?, device_power = ?, device_temperature = ?, device_light_threshold = ?, device_brightness = ?, power_total = ?, strobe_count = ? where serial_number = ? and delete_status = 0",
 		attr, data.DevicePower, data.DeviceTemperature, data.DeviceLightThreshold, data.DeviceBrightness, data.PowerTotal, data.StrobeCount, data.SerialNumber)
 	context.Send(0x0001, context.GetMessage().MsgBody)
-	return 200,"OK"
+	return 200, "OK"
 }
 
 func init() {
 	platform.Register(0x0001, asyncAttribute)
 }
-

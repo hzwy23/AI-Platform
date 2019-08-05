@@ -26,7 +26,7 @@ type DeviceInfo struct {
 }
 
 func reconnect() (*net.TCPConn, error) {
- tcpAddr, err := net.ResolveTCPAddr("tcp", "121.42.143.130:8989")
+ tcpAddr, err := net.ResolveTCPAddr("tcp", "localhost:8989")
  if err != nil {
   logger.Error("", err)
  }
@@ -97,7 +97,7 @@ func read(conn *net.TCPConn) {
 }
 
 func getBroadcast()  {
- conn, err := net.Dial("udp", "192.168.31.244:8900")
+ conn, err := net.Dial("udp", "192.168.2.255:8900")
  if err != nil {
   fmt.Println(err)
   return
@@ -122,30 +122,35 @@ func getBroadcast()  {
  //}
  //_, _ := json.Marshal(dt)
 
- data ,err := protocol.Pack(0, []byte(`{"client_IP":"192.168.2.100","client_PORT":"8989","client_CPUID":"1111111111111111","client_FrameworkVersion":"1.2.3","client_GATEWAY":"192.168.2.1","client_MAC":"01-df-de-sa-df","client_Mode":"Auto","client_MASK":"255.255.255.0","client_Temp":"47.84"}`))
- fmt.Println(data)
- size,err:=conn.Write(data)
- fmt.Println("write",size,err)
+ data ,err := protocol.Pack(0x7fff, []byte(`{"client_IP":"192.168.2.100","client_PORT":"8989","client_CPUID":"1111111111111111","client_FrameworkVersion":"1.2.3","client_GATEWAY":"192.168.2.1","client_MAC":"01-df-de-sa-df","client_Mode":"Auto","client_MASK":"255.255.255.0","client_Temp":"47.84"}`))
+ conn.Write(data)
+ //for i:=0; i < len(data); i++ {
+ //  conn.Write(data[i:i+1])
+ //  fmt.Println(data[i:i+1])
+ //  time.Sleep(time.Millisecond * 1)
+ //}
+ conn.Write(data)
+ fmt.Println("write",err)
 }
 
 func main() {
- //tcpAddr, err := net.ResolveTCPAddr("tcp", "121.42.143.130:8989")
+ //tcpAddr, err := net.ResolveTCPAddr("tcp", "localhost:8989")
  //if err != nil {
- // logger.Error("", err)
+ //logger.Error("", err)
  //}
  //conn, err := net.DialTCP("tcp", nil, tcpAddr)
  //if err != nil {
- // logger.Error("连接失败，", err)
+ //logger.Error("连接失败，", err)
  //}
  //defer conn.Close()
- //data ,err := protocol.Pack(888, []byte{'i', 'o', 't', 'h', 'u', 'b', 'a', 's', 'd', 'f', 'd'})
+ //data ,err := protocol.Pack(0x7fff, []byte{'i', 'o', 't', 'h', 'u', 'b', 'a', 's', 'd', 'f', 'd'})
  //fmt.Println(data)
  //go write(conn, data)
  //go read(conn)
  go func() {
   for {
    getBroadcast()
-   time.Sleep(time.Millisecond*2000)
+   time.Sleep(time.Second*5)
   }
  }()
  for {

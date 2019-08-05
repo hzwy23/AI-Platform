@@ -5,10 +5,10 @@ import (
 	"fmt"
 )
 
-func echo(context *platform.Context) (int, string){
+func echo(context *platform.Context) (int, string) {
 	fmt.Println("echo:", context.GetMessage().MsgBody, context.GetMsgId())
 	context.Send(0x7fff, context.GetMessage().MsgBody)
-	return 200,"OK"
+	return 200, "OK"
 }
 
 func init() {

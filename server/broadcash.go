@@ -26,13 +26,13 @@ func GetBroadcast() []string {
 	return Get(ipNets)
 }
 
-func GetBroadcastIpFromDb() (string, error){
+func GetBroadcastIpFromDb() (string, error) {
 	rst := ""
 	err := dbobj.QueryForObject("select item_value from sys_global_config where item_id = ?", dbobj.PackArgs(1), &rst)
 	return rst, err
 }
 
-func GetBroadcastPortFromDb() (string, error){
+func GetBroadcastPortFromDb() (string, error) {
 	rst := ""
 	err := dbobj.QueryForObject("select item_value from sys_global_config where item_id = ?", dbobj.PackArgs(2), &rst)
 	return rst, err
@@ -95,8 +95,8 @@ func Broadcast(ip string, port string) {
 	}
 	defer conn.Close()
 
-	logger.Info("开启广播服务, broadcast ip is:", ip, ", port is:",port)
-	fmt.Println("开启广播服务, broadcast ip is:", ip, ", port is:",port)
+	logger.Info("开启广播服务, broadcast ip is:", ip, ", port is:", port)
+	fmt.Println("开启广播服务, broadcast ip is:", ip, ", port is:", port)
 	for {
 		platform.NewUDPPlatformServer(conn)
 		time.Sleep(time.Millisecond * 50)

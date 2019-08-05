@@ -13,7 +13,7 @@ type HomePageController struct {
 	srv service.DeviceScanService
 }
 
-func (r *HomePageController) Get(resp http.ResponseWriter, req *http.Request)  {
+func (r *HomePageController) Get(resp http.ResponseWriter, req *http.Request) {
 	item := int64(0)
 	err := dbobj.QueryForObject("select sum(power_total) from device_manage_info where delete_status = 0", dbobj.PackArgs(), &item)
 	if err != nil {
@@ -31,13 +31,13 @@ func (r *HomePageController) Get(resp http.ResponseWriter, req *http.Request)  {
 	result["LampWarnCnt"] = lampCnt
 	result["ScanDeviceCnt"] = int64(len(rst))
 	result["AddedDevice"] = int64(sCnt)
-	hret.Success(resp,result)
+	hret.Success(resp, result)
 
 }
 
-func init()  {
+func init() {
 	ctl := HomePageController{
 		srv: service.NewDeviceScanService(),
 	}
-	route.Handler("GET","/api/homepage/statistics", ctl.Get)
+	route.Handler("GET", "/api/homepage/statistics", ctl.Get)
 }
