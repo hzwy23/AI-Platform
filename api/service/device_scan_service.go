@@ -4,7 +4,7 @@ import (
 	"ai-platform/api/dao"
 	"ai-platform/api/entity"
 	"ai-platform/dbobj"
-	"ai-platform/server/service"
+	"ai-platform/server/platform"
 )
 
 type DeviceScanService interface {
@@ -17,7 +17,7 @@ type deviceScanServiceImpl struct {
 
 func (r *deviceScanServiceImpl) FindAll() ([]entity.DeviceScan, int, error) {
 	data := make([]entity.DeviceScan, 0)
-	ret := service.GetOnlineDevice()
+	ret := platform.GetOnlineDevice()
 	idx := 0
 	for _, val := range ret {
 

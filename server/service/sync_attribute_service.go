@@ -28,7 +28,6 @@ type DeviceAttribute struct {
 	// 设备属性  <Option value="1">常亮</Option>
 	//         <Option value="2">频闪</Option>
 	//         <Option value="3">爆灯</Option>
-	//         <Option value="4">自动</Option>
 	DeviceAttribute string `json:"client_Mode"`
 }
 
@@ -56,9 +55,11 @@ func asyncAttribute(context *platform.Context) (int, string) {
 		attr = 3
 	}
 
-	dbobj.Exec("update device_manage_info set device_attribute = ?, device_power = ?, device_temperature = ?, device_light_threshold = ?, device_brightness = ?, power_total = ?, strobe_count = ? where serial_number = ? and delete_status = 0",
+	_, err = dbobj.Exec("update device_manage_info set device_attribute = ?, device_power = ?, device_temperature = ?, device_light_threshold = ?, device_brightness = ?, power_total = ?, strobe_count = ? where serial_number = ? and delete_status = 0",
 		attr, data.DevicePower, data.DeviceTemperature, data.DeviceLightThreshold, data.DeviceBrightness, data.PowerTotal, data.StrobeCount, data.SerialNumber)
-	context.Send(0x0001, context.GetMessage().MsgBody)
+	if err != nil {
+		return 500, err.Error()
+	}
 	return 200, "OK"
 }
 

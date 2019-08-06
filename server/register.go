@@ -5,6 +5,7 @@ import (
 	"ai-platform/panda/logger"
 	"ai-platform/server/platform"
 	_ "ai-platform/server/service"
+	"fmt"
 	"strconv"
 )
 
@@ -24,6 +25,7 @@ func AIPlatformBootstrap() {
 		logger.Warn("http.port 不存在，使用默认端口[8989]启动服务")
 		configPort = "8989"
 	}
+
 	port, err := strconv.Atoi(configPort)
 	if err != nil {
 		logger.Warn("无效的配置端口", configPort, "，使用默认端口[ 8989 ]启动服务")
@@ -31,6 +33,7 @@ func AIPlatformBootstrap() {
 	}
 
 	logger.Info("AI智能灯控平台启动，监听端口是：", port)
+	fmt.Println("start device platform, listen  port is: ",  port)
 	server := platform.NewDefaultPlatformServer("", port, "tcp")
 	go server.Start()
 

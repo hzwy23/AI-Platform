@@ -2,10 +2,10 @@ package controller
 
 import (
 	"ai-platform/api/dao"
-	"ai-platform/api/utils"
 	"ai-platform/panda/hret"
 	"ai-platform/panda/logger"
 	"ai-platform/panda/route"
+	"ai-platform/server/utils"
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
@@ -27,7 +27,7 @@ type DeviceNetworkData struct {
 	DNS             string `json:"client_DNS"`
 	MacAddress      string `json:"client_MAC"`
 	ServerIp        string `json:"server1_IP"`
-	SERVERPort      string `json:"server1_PORT"`
+	ServerPort      string `json:"server1_PORT"`
 	BackServerIp    string `json:"server2_IP"`
 	BackServerPort  string `json:"server2_PORT"`
 	ServerDomain    string `json:"server_ADDR"`
@@ -39,13 +39,6 @@ type DeviceAttrData struct {
 	DeviceAttribute      string `json:"client_Mode"`
 	DeviceBrightness     string `json:"client_LightLevel"`
 	DeviceLightThreshold string `json:"client_CDSThreshold"`
-}
-
-type DeviceControlData struct {
-	SerialNumber  string `json:"client_CPUID"`
-	LightMode     string `json:"client_AutoFunction"`
-	AutoStartTime string `json:"AutoTimeStart"`
-	AutoEndTime   string `json:"AutoTimeStop"`
 }
 
 type RemoteDeviceController struct {
@@ -145,7 +138,7 @@ func (r *RemoteDeviceController) UpdateNetwork(resp http.ResponseWriter, req *ht
 		MacAddress:      "",
 		DNS:             "",
 		ServerIp:        "",
-		SERVERPort:      "",
+		ServerPort:      "",
 		BackServerIp:    "",
 		BackServerPort:  "",
 		ServerDomain:    "",
@@ -189,7 +182,22 @@ func (r *RemoteDeviceController) UpdateDeviceAttr(resp http.ResponseWriter, req 
 		hret.Error(resp, 500300, err.Error())
 		return
 	}
-	err = updateLightMode(serialNumber, req.Form)
+
+	cmd := utils.DeviceControlData{
+		SerialNumber:  serialNumber,
+		AutoStartTime: req.FormValue("AutoStartTime"),
+		AutoEndTime:   req.FormValue("AutoEndTime"),
+	}
+	LightMode := req.FormValue("LightMode")
+	if LightMode == "1" {
+		cmd.LightMode = "CDS"
+	} else if LightMode == "2" {
+		cmd.LightMode = "Timer"
+	} else if LightMode == "3" {
+		cmd.LightMode = "All"
+	}
+
+	err = utils.UpdateLightMode(serialNumber, cmd)
 	if err != nil {
 		logger.Error(err)
 		hret.Error(resp, 500300, err.Error())
@@ -207,30 +215,6 @@ func updateDevice(serialNumber string, form url.Values) error {
 		DeviceLightThreshold: form.Get("DeviceLightThreshold"),
 	}
 	body, _ := json.Marshal(deviceAttr)
-	err := utils.Command(0x8001, serialNumber, body)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-// 更新灯光控制策略
-func updateLightMode(serialNumber string, form url.Values) error {
-
-	cmd := DeviceControlData{
-		SerialNumber:  serialNumber,
-		AutoStartTime: form.Get("AutoStartTime"),
-		AutoEndTime:   form.Get("AutoEndTime"),
-	}
-	LightMode := form.Get("LightMode")
-	if LightMode == "1" {
-		cmd.LightMode = "CDS"
-	} else if LightMode == "2" {
-		cmd.LightMode = "Timer"
-	} else if LightMode == "3" {
-		cmd.LightMode = "All"
-	}
-	body, _ := json.Marshal(cmd)
 	err := utils.Command(0x8001, serialNumber, body)
 	if err != nil {
 		return err

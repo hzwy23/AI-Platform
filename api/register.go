@@ -2,9 +2,9 @@ package api
 
 import (
 	_ "ai-platform/api/controller"
-	"fmt"
+	"ai-platform/panda/logger"
 )
 
 func Register() {
-	fmt.Println("开启后台API服务")
+	logger.Info("Register API")
 }
