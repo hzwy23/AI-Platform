@@ -3,6 +3,7 @@ package service
 import (
 	"ai-platform/panda/logger"
 	"ai-platform/server/platform"
+	"ai-platform/server/proto_data"
 	"ai-platform/server/utils"
 	"encoding/json"
 	"fmt"
@@ -10,25 +11,15 @@ import (
 	"time"
 )
 
-type AsyncTimeData struct {
-	SerialNumber string `json:"client_CPUID"`
-	TimeZone string `json:"TimeZone"`
-	Year string `json:"Year"`
-	Month string `json:"Month"`
-	Day string `json:"Day"`
-	Hour string `json:"Hour"`
-	Minute string `json:"Minute"`
-	Second string `json:"Second"`
-	Week string `json:"Week"`
-}
-
+// asyncTimeService 同步时间
+// 设备向平台发送0x0002请求，平台给设备返回0x8002
 func asyncTimeService(context *platform.Context)  (int, string)  {
 	defer func() {
 		if r := recover(); r != nil {
 			fmt.Println(r)
 		}
 	}()
-	var data AsyncTimeData
+	var data proto_data.AsyncTimeData
 	err := json.Unmarshal(context.GetMessage().MsgBody, &data)
 	if err != nil {
 		logger.Error(err)
@@ -44,7 +35,7 @@ func asyncTimeService(context *platform.Context)  (int, string)  {
 	data.Week = strconv.Itoa(int(now.Weekday()))
 	data.TimeZone, _ = now.Zone()
 	body, _ := json.Marshal(data)
-	err = utils.Command(context.GetMsgId(),data.SerialNumber, body)
+	err = utils.Command(0x8002, data.SerialNumber, body)
 	if err != nil {
 		return 400, err.Error()
 	}
@@ -52,5 +43,5 @@ func asyncTimeService(context *platform.Context)  (int, string)  {
 }
 
 func init()  {
-	platform.Register(0x0002,asyncTimeService)
+	platform.Register(0x0002, asyncTimeService)
 }

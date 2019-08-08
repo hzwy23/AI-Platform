@@ -3,6 +3,7 @@ package dao
 import (
 	"ai-platform/api/entity"
 	"ai-platform/dbobj"
+	"ai-platform/panda/logger"
 	"errors"
 	"strings"
 )
@@ -66,7 +67,7 @@ func (r *deviceManageInfoDaoImpl) Update(item entity.DeviceManageInfo) (int64, e
 		item.Longitude, item.Latitude,
 		item.Mask, item.Gateway, item.Pin, item.UpdateBy,
 		item.UpdateDate, item.PowerTotal, item.StrobeCount, item.DeviceId)
-
+	logger.Info("更新设备信息，跟新内容是：", item)
 	if result != nil {
 		return 0, err
 	}

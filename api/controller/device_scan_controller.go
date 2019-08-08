@@ -1,17 +1,17 @@
 package controller
 
 import (
-	"ai-platform/api/service"
 	"ai-platform/panda/hret"
 	"ai-platform/panda/logger"
 	"ai-platform/panda/route"
+	service2 "ai-platform/server/service"
 	"encoding/json"
 	"net/http"
 	"strconv"
 )
 
 type DeviceScanController struct {
-	deviceScan service.DeviceScanService
+	deviceScan service2.DeviceScanService
 }
 
 func (r *DeviceScanController) Get(resp http.ResponseWriter, req *http.Request) {
@@ -40,7 +40,7 @@ func (r *DeviceScanController) Get(resp http.ResponseWriter, req *http.Request) 
 
 func init() {
 	scan := &DeviceScanController{
-		deviceScan: service.NewDeviceScanService(),
+		deviceScan: service2.NewDeviceScanService(),
 	}
 	route.Handler("GET", "/api/scan/device", scan.Get)
 }

@@ -2,6 +2,7 @@ package controller
 
 import (
 	"ai-platform/api/dao"
+	"ai-platform/dbobj"
 	"ai-platform/panda/hret"
 	"ai-platform/panda/logger"
 	"ai-platform/panda/route"
@@ -109,7 +110,7 @@ func (r *RemoteDeviceController) Minus(resp http.ResponseWriter, req *http.Reque
 	hret.Success(resp, "Success")
 }
 
-// 修改网络参数
+// UpdateNetwork 修改网络参数
 func (r *RemoteDeviceController) UpdateNetwork(resp http.ResponseWriter, req *http.Request, params route.Params) {
 
 	req.ParseForm()
@@ -158,15 +159,18 @@ func (r *RemoteDeviceController) UpdateNetwork(resp http.ResponseWriter, req *ht
 	hret.Success(resp, "Success")
 }
 
-// 更新设备属性
+// UpdateDeviceAttr 更新设备属性
 func (r *RemoteDeviceController) UpdateDeviceAttr(resp http.ResponseWriter, req *http.Request, params route.Params) {
 
 	req.ParseForm()
 	serialNumber := params.ByName("SerialNumber")
+	deviceName := req.FormValue("DeviceName")
 	if len(serialNumber) == 0 {
 		hret.Error(resp, 500300, "无效的设备序列号")
 		return
 	}
+
+	dbobj.Exec("update device_manage_info set device_name = ? where delete_status = 0 and serial_number = ?", deviceName, serialNumber)
 
 	// 查看设备是否在线
 	item, err := r.deviceDao.FindBySerialNumber(serialNumber)
@@ -203,6 +207,7 @@ func (r *RemoteDeviceController) UpdateDeviceAttr(resp http.ResponseWriter, req 
 		hret.Error(resp, 500300, err.Error())
 		return
 	}
+
 	hret.Success(resp, "Success")
 }
 

@@ -1,16 +1,16 @@
 package controller
 
 import (
-	"ai-platform/api/service"
 	"ai-platform/dbobj"
 	"ai-platform/panda/hret"
 	"ai-platform/panda/logger"
 	"ai-platform/panda/route"
+	service2 "ai-platform/server/service"
 	"net/http"
 )
 
 type HomePageController struct {
-	srv service.DeviceScanService
+	srv service2.DeviceScanService
 }
 
 func (r *HomePageController) Get(resp http.ResponseWriter, req *http.Request) {
@@ -37,7 +37,7 @@ func (r *HomePageController) Get(resp http.ResponseWriter, req *http.Request) {
 
 func init() {
 	ctl := HomePageController{
-		srv: service.NewDeviceScanService(),
+		srv: service2.NewDeviceScanService(),
 	}
 	route.Handler("GET", "/api/homepage/statistics", ctl.Get)
 }

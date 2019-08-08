@@ -49,19 +49,6 @@ func (r *DeviceManageInfoController) Get(resp http.ResponseWriter, req *http.Req
 func (r *DeviceManageInfoController) Post(resp http.ResponseWriter, req *http.Request) {
 	req.ParseForm()
 
-	//dchpFlag := req.FormValue("DhcpFlag")
-	//dhcp, err := strconv.Atoi(dchpFlag)
-	//if err != nil {
-	//	hret.Error(resp,500100, err.Error())
-	//	return
-	//}
-	//attr := req.FormValue("DeviceAttribute")
-	//attribute, err := strconv.Atoi(attr)
-	//if err != nil {
-	//	hret.Error(resp,500101, err.Error())
-	//	return
-	//}
-
 	claim, err := jwt.ParseHttp(req)
 	if err != nil {
 		logger.Error(err)

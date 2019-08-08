@@ -18,8 +18,14 @@ function copy_static() {
 
 function window() {
   echo "编译windows平台软件"
-	GOOS=windows GOARCH=amd64 go build -o windows_start.exe main.go
-	pack_application "windows_start.exe"
+	GOOS=windows GOARCH=amd64 go build -o windows_x64_start.exe main.go
+	pack_application "windows_x64_start.exe"
+}
+
+function window32() {
+  echo "编译windows 323位平台软件"
+	GOOS=windows GOARCH=386 go build -o windows_x86_start.exe main.go
+	pack_application "windows_x86_start.exe"
 }
 
 function macos() {
@@ -53,6 +59,7 @@ case $1 in
   *)
     clean_application
     window
+    window32
     macos
     linux
     copy_static
