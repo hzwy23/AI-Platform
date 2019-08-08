@@ -92,7 +92,7 @@ func removeOfflineDevice() {
 			}
 
 		}
-		logger.Info("delete offline device")
+		logger.Info("sync device status")
 		time.Sleep(time.Second * 5)
 	}
 }

@@ -6,6 +6,7 @@ import (
 	"ai-platform/panda/hret"
 	"ai-platform/panda/logger"
 	"ai-platform/panda/route"
+	"ai-platform/server/proto_data"
 	"ai-platform/server/utils"
 	"encoding/json"
 	"io/ioutil"
@@ -187,11 +188,18 @@ func (r *RemoteDeviceController) UpdateDeviceAttr(resp http.ResponseWriter, req 
 		return
 	}
 
-	cmd := utils.DeviceControlData{
+	cmd := proto_data.DeviceControlData{
 		SerialNumber:  serialNumber,
 		AutoStartTime: req.FormValue("AutoStartTime"),
 		AutoEndTime:   req.FormValue("AutoEndTime"),
 	}
+	if cmd.AutoEndTime == "Invalid date" {
+		cmd.AutoEndTime = ""
+	}
+	if cmd.AutoStartTime == "Invalid date" {
+		cmd.AutoStartTime = ""
+	}
+
 	LightMode := req.FormValue("LightMode")
 	if LightMode == "1" {
 		cmd.LightMode = "CDS"
@@ -201,7 +209,7 @@ func (r *RemoteDeviceController) UpdateDeviceAttr(resp http.ResponseWriter, req 
 		cmd.LightMode = "All"
 	}
 
-	err = utils.UpdateLightMode(serialNumber, cmd)
+	err = updateLightMode(serialNumber, cmd, LightMode)
 	if err != nil {
 		logger.Error(err)
 		hret.Error(resp, 500300, err.Error())
@@ -210,6 +218,19 @@ func (r *RemoteDeviceController) UpdateDeviceAttr(resp http.ResponseWriter, req 
 
 	hret.Success(resp, "Success")
 }
+
+// 更新灯光控制策略
+func updateLightMode(serialNumber string,  cmd proto_data.DeviceControlData, lightMode string) error {
+	body, _ := json.Marshal(cmd)
+	err := utils.Command(0x8005, serialNumber, body)
+	if err != nil {
+		return err
+	}
+	dbobj.Exec("update device_manage_info set light_mode = ?, auto_start_time = ?, auto_end_time = ? where serial_number = ? and delete_status = 0",
+		lightMode, cmd.AutoStartTime, cmd.AutoEndTime, serialNumber)
+	return nil
+}
+
 
 // 更新属性
 func updateDevice(serialNumber string, form url.Values) error {
@@ -224,6 +245,8 @@ func updateDevice(serialNumber string, form url.Values) error {
 	if err != nil {
 		return err
 	}
+	dbobj.Exec("update device_manage_info set device_attribute = ?, device_brightness = ?, device_light_threshold = ? where delete_status = 0 and serial_number = ?",
+		deviceAttr.DeviceAttribute, deviceAttr.DeviceBrightness, deviceAttr.DeviceLightThreshold, deviceAttr.SerialNumber)
 	return nil
 }
 

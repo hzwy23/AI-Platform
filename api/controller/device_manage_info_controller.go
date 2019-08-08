@@ -45,7 +45,7 @@ func (r *DeviceManageInfoController) Get(resp http.ResponseWriter, req *http.Req
 }
 
 // 添加设备
-// 从扫描到的设备中，选择制定设备，添加到设备管理列表
+// 从扫描到的设备中，选择指定设备，添加到设备管理列表
 func (r *DeviceManageInfoController) Post(resp http.ResponseWriter, req *http.Request) {
 	req.ParseForm()
 
@@ -69,8 +69,6 @@ func (r *DeviceManageInfoController) Post(resp http.ResponseWriter, req *http.Re
 		DevicePort: req.FormValue("DevicePort"),
 
 		DeviceStatus: 1,
-		// 设备属性
-		//DeviceAttribute: uint8(attribute),
 
 		// MAC地址
 		MacAddress: req.FormValue("MacAddress"),
@@ -94,10 +92,6 @@ func (r *DeviceManageInfoController) Post(resp http.ResponseWriter, req *http.Re
 	}
 
 	hret.Success(resp, "Success")
-}
-
-func (r *DeviceManageInfoController) Put(resp http.ResponseWriter, req *http.Request) {
-
 }
 
 func (r *DeviceManageInfoController) Delete(resp http.ResponseWriter, req *http.Request, param route.Params) {
@@ -209,7 +203,6 @@ func init() {
 	route.Handler("GET", "/api/device/manage/ungroup", ctl.GetUnGroupDevice)
 	route.Handler("POST", "/api/device/manage", ctl.Post)
 	route.Handler("POST", "/api/device/manage/group", ctl.UpdateDeviceGroup)
-	route.Handler("PUT", "/api/device/manage", ctl.Put)
 	route.Handler("PUT", "/api/device/group/change", ctl.ChangeGroup)
 	route.DELETE("/api/device/manage/:deviceId", ctl.Delete)
 	route.DELETE("/api/device/bind/:id", ctl.RemoveFromGroup)
