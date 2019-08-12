@@ -90,17 +90,39 @@ func removeOfflineDevice() {
 				dbobj.Exec("delete from device_scan_info where serial_number = ?", val.SerialNumber)
 				service.AddAlarmEvent(val.SerialNumber, 2)
 			}
-
 		}
 		logger.Info("sync device status")
 		time.Sleep(time.Second * 5)
 	}
 }
 
+func checkAddedDevice()  {
+	defer hret.RecvPanic()
+	for {
+		rst, err := device.FindAll("")
+		if err != nil {
+			logger.Error(err)
+			time.Sleep(time.Second*5)
+		}
+		for _, item := range rst {
+			var cnt = 0
+			err = dbobj.QueryForObject("select count(*) from device_scan_info where serial_number = ?", dbobj.PackArgs(item.SerialNumber), &cnt)
+			if err != nil || cnt == 0 {
+				service.AddAlarmEvent(item.SerialNumber, 2)			}
+		}
+		time.Sleep(time.Second*10)
+	}
+
+}
+
 func init() {
 
 	alarm = dao.NewEventAlarmInfoDao()
 
+	device = dao.NewDeviceManageInfoDao()
+
 	go removeOfflineDevice()
+
+	go checkAddedDevice()
 
 }
