@@ -33,7 +33,7 @@ func AIPlatformBootstrap() {
 	}
 
 	logger.Info("AI智能灯控平台启动，监听端口是：", port)
-	fmt.Println("start device platform, listen  port is: ",  port)
+	fmt.Println("start device platform, listen  port is: ", port)
 	server := platform.NewDefaultPlatformServer("", port, "tcp")
 	go server.Start()
 

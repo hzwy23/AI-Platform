@@ -84,6 +84,7 @@ func (r *DeviceManageInfoController) Post(resp http.ResponseWriter, req *http.Re
 		UpdateBy:     claim.UserId,
 		UpdateDate:   panda.CurTime(),
 		DeleteStatus: 0,
+		Pin:          req.FormValue("Pin"),
 	}
 	err = r.service.AddDevice(item, req.FormValue("GroupId"))
 	if err != nil {

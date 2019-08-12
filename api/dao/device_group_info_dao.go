@@ -3,7 +3,7 @@ package dao
 import (
 	"ai-platform/api/entity"
 	"ai-platform/dbobj"
-	"errors"
+	"ai-platform/panda/logger"
 )
 
 // 设备分组信息表
@@ -50,17 +50,16 @@ func (r *deviceGroupInfoDaoImpl) FindById(groupId int) (entity.DeviceGroupInfo, 
 func (r *deviceGroupInfoDaoImpl) UpdateById(item entity.DeviceGroupInfo) error {
 	ret, err := dbobj.Exec("update device_group_info set group_name = ?, update_by = ?, update_date = ? where group_id = ? and delete_status = 0",
 		item.GroupName, item.UpdateBy, item.UpdateDate, item.GroupId)
-	if ret == nil {
-		return err
-	}
-	size, err := ret.RowsAffected()
 	if err != nil {
+		logger.Error(err)
 		return err
 	}
-	if size > 0 {
-		return nil
+	_, err = ret.RowsAffected()
+	if err != nil {
+		logger.Error(err)
+		return err
 	}
-	return errors.New("更新设备组名称失败")
+	return nil
 }
 
 // 逻辑删除分组

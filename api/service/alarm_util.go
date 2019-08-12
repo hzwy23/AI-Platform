@@ -12,8 +12,7 @@ import (
 var device = dao.NewDeviceManageInfoDao()
 var alarm = dao.NewEventAlarmInfoDao()
 
-
-func AddAlarmEvent(key string, eventTypeCd int)  {
+func AddAlarmEvent(key string, eventTypeCd int) {
 	element, err := device.FindBySerialNumber(key)
 	if err != nil {
 		fmt.Println(err)
@@ -22,10 +21,10 @@ func AddAlarmEvent(key string, eventTypeCd int)  {
 		return
 	}
 
-	status :=  1
+	status := 1
 	if eventTypeCd == 1 {
 		status = 3
-	} else  if eventTypeCd == 2 {
+	} else if eventTypeCd == 2 {
 		status = 4
 	} else if eventTypeCd == 3 {
 		status = 2

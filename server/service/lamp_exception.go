@@ -38,7 +38,6 @@ func lampException(context *platform.Context) (int, string) {
 	return 200, "Ok"
 }
 
-
-func init()  {
+func init() {
 	platform.Register(0x0006, lampException)
 }

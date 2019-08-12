@@ -10,7 +10,7 @@ import (
 
 var warnTemperature = 80
 
-func CheckTemperature(device proto_data.DeviceAttribute)  {
+func CheckTemperature(device proto_data.DeviceAttribute) {
 	tp, err := strconv.Atoi(device.DeviceTemperature)
 	if err != nil && tp > warnTemperature {
 		// 设备温度异常
@@ -21,7 +21,7 @@ func CheckTemperature(device proto_data.DeviceAttribute)  {
 	}
 }
 
-func init()  {
+func init() {
 	var rst string
 	_, err := dbobj.Exec("select item_value from sys_global_config where item_id = 3", dbobj.PackArgs(), &rst)
 	if err == nil {

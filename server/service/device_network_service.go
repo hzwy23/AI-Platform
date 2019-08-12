@@ -10,7 +10,6 @@ import (
 	"time"
 )
 
-
 // 接收广播消息
 func broadcast(context *platform.Context) (int, string) {
 	defer hret.RecvPanic()
@@ -25,7 +24,7 @@ func broadcast(context *platform.Context) (int, string) {
 			// 最近刷新的时间戳
 			RefreshTime: start,
 			// 在线标示
-			OnlineStatus:1,
+			OnlineStatus: 1,
 			// 固件版本
 			FirmwareVersion: bd.FirmwareVersion,
 			// 设备IP
@@ -46,8 +45,6 @@ func broadcast(context *platform.Context) (int, string) {
 	}
 	return 200, "Ok"
 }
-
-
 
 func init() {
 

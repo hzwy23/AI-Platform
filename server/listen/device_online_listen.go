@@ -46,18 +46,18 @@ func GetOnlineItem(serialNumber string) (OnlineDevice, error) {
 	return rst, err
 }
 
-func UpdateOnlineDevice(key string, element *OnlineDevice)  {
+func UpdateOnlineDevice(key string, element *OnlineDevice) {
 	var cnt = 0
-	err := dbobj.QueryForObject("select count(*) from device_scan_info where serial_number = ?", dbobj.PackArgs(key),  &cnt)
+	err := dbobj.QueryForObject("select count(*) from device_scan_info where serial_number = ?", dbobj.PackArgs(key), &cnt)
 	if err != nil {
-		logger.Warn("查询设备是否已经被扫描到，失败原因是：",err)
+		logger.Warn("查询设备是否已经被扫描到，失败原因是：", err)
 		return
 	}
 
 	if cnt > 0 {
 		// 更新操作
 		dbobj.Exec("update device_scan_info set refresh_time = ?,  online_status = 1, firmware_version = ?, device_ip = ?, mask = ?, gateway_addr = ?, device_port = ?, mac_addr = ? where serial_number = ?",
-			element.RefreshTime, element. FirmwareVersion, element.DeviceIp, element.Mask, element.GatewayAddr, element.DevicePort, element.MacAddr, element.SerialNumber)
+			element.RefreshTime, element.FirmwareVersion, element.DeviceIp, element.Mask, element.GatewayAddr, element.DevicePort, element.MacAddr, element.SerialNumber)
 	} else {
 		// 新增操作
 		dbobj.Exec("insert into device_scan_info(serial_number, refresh_time, online_status, firmware_version, device_ip, mask, gateway_addr, device_port, mac_addr) values(?,?,?,?,?,?,?,?,?)",
@@ -88,7 +88,7 @@ func removeOfflineDevice() {
 			if duration > 30 {
 				logger.Info("从设备扫描列表中删除设备", val.SerialNumber)
 				dbobj.Exec("delete from device_scan_info where serial_number = ?", val.SerialNumber)
-				service.AddAlarmEvent(val.SerialNumber,2)
+				service.AddAlarmEvent(val.SerialNumber, 2)
 			}
 
 		}
@@ -97,7 +97,7 @@ func removeOfflineDevice() {
 	}
 }
 
-func init()  {
+func init() {
 
 	alarm = dao.NewEventAlarmInfoDao()
 

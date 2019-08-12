@@ -13,7 +13,7 @@ import (
 
 // asyncTimeService 同步时间
 // 设备向平台发送0x0002请求，平台给设备返回0x8002
-func asyncTimeService(context *platform.Context)  (int, string)  {
+func asyncTimeService(context *platform.Context) (int, string) {
 	defer func() {
 		if r := recover(); r != nil {
 			fmt.Println(r)
@@ -42,6 +42,6 @@ func asyncTimeService(context *platform.Context)  (int, string)  {
 	return 0, "Ok"
 }
 
-func init()  {
+func init() {
 	platform.Register(0x0002, asyncTimeService)
 }

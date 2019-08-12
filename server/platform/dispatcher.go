@@ -69,7 +69,7 @@ func dispatcher(context *Context) {
 	go genLog(context.msgId, context.message.MsgBody, code, retMsg)
 }
 
-func genLog(msgId uint16, msg []byte, code int, retMsg string )  {
+func genLog(msgId uint16, msg []byte, code int, retMsg string) {
 	defer hret.RecvPanic()
 
 	if msg == nil || len(msg) == 0 {
@@ -128,6 +128,6 @@ func savelogs(data []entity.PlatDeviceLogger) {
 	}
 }
 
-func init()  {
+func init() {
 	go logSync()
 }

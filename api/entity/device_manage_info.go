@@ -57,4 +57,6 @@ type DeviceManageInfo struct {
 	GroupId int
 	// 分组名称
 	GroupName string
+	// 爆闪时间（ms）
+	FlashDuration int
 }

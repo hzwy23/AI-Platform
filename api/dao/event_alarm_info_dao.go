@@ -63,7 +63,7 @@ func (r *eventAlarmInfoDaoImpl) FindAll() ([]entity.EventAlarmInfo, error) {
 
 func (r *eventAlarmInfoDaoImpl) FindByTypeCd(typeCd string) ([]entity.EventAlarmInfo, error) {
 	rst := make([]entity.EventAlarmInfo, 0)
-	err := dbobj.QueryForSlice("select id, event_type_cd, occurrence_time, serial_number, device_name, device_ip, device_attribute, device_brightness, device_temperature, handle_status from event_alarm_info where delete_status = 0 and event_type_cd = ? order by id desc", &rst, typeCd)
+	err := dbobj.QueryForSlice("select id, event_type_cd, occurrence_time, serial_number, device_name, device_ip, device_attribute, device_brightness, device_temperature, handle_status from event_alarm_info where delete_status = 0 and event_type_cd = ? order by handle_status asc, id desc", &rst, typeCd)
 	return rst, err
 }
 

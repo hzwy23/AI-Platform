@@ -3,7 +3,7 @@ package i18n
 import "net/http"
 
 func NoAuth(req *http.Request) string {
-	return Get(req, "as_of_date_no_auth")
+	return Get(req, "权限不足， 您没有被授权使用此项功能")
 }
 
 // 执行成功

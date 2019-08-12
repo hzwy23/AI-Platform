@@ -17,7 +17,7 @@ type deviceScanServiceImpl struct {
 
 func (r *deviceScanServiceImpl) FindAll() ([]entity.DeviceScan, int, error) {
 	data := make([]entity.DeviceScan, 0)
-	ret,_ := listen.GetOnlineDevice()
+	ret, _ := listen.GetOnlineDevice()
 	idx := 0
 	for _, val := range ret {
 
