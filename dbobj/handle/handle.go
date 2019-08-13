@@ -1,4 +1,4 @@
-package dbhandle
+package handle
 
 import (
 	"ai-platform/panda/config"
@@ -55,9 +55,11 @@ func Register(dsn string, f instance) {
 	defer dbLock.Unlock()
 	if f == nil {
 		logger.Error("sql: Register driver is nil")
+		return
 	}
 	if _, dup := Adapter[dsn]; dup {
 		logger.Error("reregister diver. dsn is :", dsn)
+		return
 	}
 	Adapter[dsn] = f
 }

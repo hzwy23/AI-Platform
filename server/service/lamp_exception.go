@@ -35,7 +35,7 @@ func lampException(context *platform.Context) (int, string) {
 		return 500, err.Error()
 	}
 	service.AddAlarmEvent(data.SerialNumber, 3)
-	return 200, "Ok"
+	return 200, "Success"
 }
 
 func init() {

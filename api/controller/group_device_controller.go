@@ -44,7 +44,7 @@ func (r *GroupDeviceController) Post(resp http.ResponseWriter, req *http.Request
 		hret.Error(resp, 50000001, err.Error(), groupName)
 		return
 	}
-	hret.Success(resp, "OK")
+	hret.Success(resp, "Success")
 }
 
 func (r *GroupDeviceController) Put(resp http.ResponseWriter, req *http.Request) {
@@ -77,7 +77,7 @@ func (r *GroupDeviceController) Put(resp http.ResponseWriter, req *http.Request)
 		hret.Error(resp, 50000001, err.Error(), groupName)
 		return
 	}
-	hret.Success(resp, "OK")
+	hret.Success(resp, "Success")
 }
 
 func (r *GroupDeviceController) Delete(resp http.ResponseWriter, req *http.Request, param route.Params) {

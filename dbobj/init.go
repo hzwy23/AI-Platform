@@ -1,13 +1,12 @@
 package dbobj
 
 import (
-	"ai-platform/dbobj/dbhandle"
-
-	_ "ai-platform/dbobj/mysql"
+	"ai-platform/dbobj/handle"
+	_ "ai-platform/dbobj/handle/mysql"
 )
 
 func init() {
-	conf, err := dbhandle.GetConfig()
+	conf, err := handle.GetConfig()
 	if err != nil {
 		panic("init database failed." + err.Error())
 	}

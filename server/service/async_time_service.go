@@ -39,7 +39,7 @@ func asyncTimeService(context *platform.Context) (int, string) {
 	if err != nil {
 		return 400, err.Error()
 	}
-	return 0, "Ok"
+	return 0, "Success"
 }
 
 func init() {

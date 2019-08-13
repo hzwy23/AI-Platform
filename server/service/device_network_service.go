@@ -43,7 +43,7 @@ func broadcast(context *platform.Context) (int, string) {
 		fmt.Println(err.Error())
 		return 50030, err.Error()
 	}
-	return 200, "Ok"
+	return 200, "Success"
 }
 
 func init() {

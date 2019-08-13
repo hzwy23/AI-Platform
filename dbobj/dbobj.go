@@ -14,24 +14,24 @@
 package dbobj
 
 import (
+	"ai-platform/dbobj/handle"
 	"database/sql"
 	"errors"
 	"fmt"
 	"reflect"
 	"strconv"
 
-	"ai-platform/dbobj/dbhandle"
 	"ai-platform/panda"
 )
 
 var (
-	dbobj   dbhandle.DbObj
+	dbobj   handle.DbObj
 	Default = "mysql"
 )
 
-func InitDB(dbtyp string) error {
+func InitDB(typ string) error {
 	if dbobj == nil {
-		if val, ok := dbhandle.Adapter[dbtyp]; ok {
+		if val, ok := handle.Adapter[typ]; ok {
 			dbobj = val()
 		}
 	}

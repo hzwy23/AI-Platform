@@ -85,14 +85,15 @@ func removeOfflineDevice() {
 		for _, val := range rst {
 			// 设备持续掉线30s将会判定为设备离线
 			duration := time.Now().Unix() - val.RefreshTime
-			if duration > 30 {
+			logger.Info(val.SerialNumber, ',',duration,',', time.Now().Unix(),',', val.RefreshTime)
+			if duration > 120 {
 				logger.Info("从设备扫描列表中删除设备", val.SerialNumber)
 				dbobj.Exec("delete from device_scan_info where serial_number = ?", val.SerialNumber)
 				service.AddAlarmEvent(val.SerialNumber, 2)
 			}
 		}
 		logger.Info("sync device status")
-		time.Sleep(time.Second * 5)
+		time.Sleep(time.Second * 2)
 	}
 }
 

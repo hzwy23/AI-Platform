@@ -15,6 +15,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"strings"
 )
 
 type MotoData struct {
@@ -236,6 +237,9 @@ func (r *RemoteDeviceController) cmd(serialNumber string, req *http.Request) {
 		cmd.LightMode = "Timer"
 	} else if LightMode == "3" {
 		cmd.LightMode = "All"
+	} else {
+		cmd.LightMode = "All"
+		LightMode = "3"
 	}
 
 	err = updateLightMode(serialNumber, cmd, LightMode)
@@ -264,7 +268,6 @@ func (r *RemoteDeviceController) UpdateDeviceAttr(resp http.ResponseWriter, req 
 		hret.Error(resp, 500200, "设备未添加到管理列表，不能进行修改")
 		return
 	}
-	fmt.Println(req.FormValue("Pin") == item.Pin, item)
 	if req.FormValue("Pin") != item.Pin {
 		logger.Warn("设备密码不正确，无法修改设备属性")
 		hret.Error(resp, 500300, "设备密码不正确，无法修改设备属性")
@@ -298,13 +301,7 @@ func (r *RemoteDeviceController) UpdateDeviceAttr(resp http.ResponseWriter, req 
 	}
 
 	LightMode := req.FormValue("LightMode")
-	if LightMode == "1" {
-		cmd.LightMode = "CDS"
-	} else if LightMode == "2" {
-		cmd.LightMode = "Timer"
-	} else if LightMode == "3" {
-		cmd.LightMode = "All"
-	}
+	cmd.LightMode = LightMode
 
 	err = updateLightMode(serialNumber, cmd, LightMode)
 	if err != nil {
@@ -322,6 +319,9 @@ func updateLightMode(serialNumber string, cmd proto_data.DeviceControlData, ligh
 	err := utils.Command(0x8005, serialNumber, body)
 	if err != nil {
 		return err
+	}
+	if len(strings.TrimSpace(lightMode)) == 0 {
+		lightMode = "3"
 	}
 	_, err = dbobj.Exec("update device_manage_info set light_mode = ?, auto_start_time = ?, auto_end_time = ? where serial_number = ? and delete_status = 0",
 		lightMode, cmd.AutoStartTime, cmd.AutoEndTime, serialNumber)
