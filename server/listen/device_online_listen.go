@@ -32,6 +32,7 @@ type OnlineDevice struct {
 
 var device dao.DeviceManageInfoDao
 var alarm dao.EventAlarmInfoDao
+var beatDuration int64
 
 // 获取在线设备信息
 func GetOnlineDevice() ([]OnlineDevice, error) {
@@ -85,8 +86,8 @@ func removeOfflineDevice() {
 		for _, val := range rst {
 			// 设备持续掉线30s将会判定为设备离线
 			duration := time.Now().Unix() - val.RefreshTime
-			logger.Info(val.SerialNumber, ',',duration,',', time.Now().Unix(),',', val.RefreshTime)
-			if duration > 120 {
+			logger.Info(val.SerialNumber, ',',duration,',',beatDuration,",", time.Now().Unix(),',', val.RefreshTime)
+			if duration > beatDuration {
 				logger.Info("从设备扫描列表中删除设备", val.SerialNumber)
 				dbobj.Exec("delete from device_scan_info where serial_number = ?", val.SerialNumber)
 				service.AddAlarmEvent(val.SerialNumber, 2)
@@ -118,10 +119,18 @@ func checkAddedDevice()  {
 
 func init() {
 
+	defer hret.RecvPanic()
+
 	alarm = dao.NewEventAlarmInfoDao()
 
 	device = dao.NewDeviceManageInfoDao()
 
+	err := dbobj.QueryForObject("select item_value from sys_global_config where item_id = 4",dbobj.PackArgs(), &beatDuration)
+	if err != nil {
+		logger.Warn("获取设备心跳时长失败. 失败原因是：", err)
+		beatDuration = 60
+	}
+	logger.Info("设备心跳保持时间是：", beatDuration)
 	go removeOfflineDevice()
 
 	go checkAddedDevice()

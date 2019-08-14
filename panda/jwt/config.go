@@ -12,7 +12,7 @@ type Config struct {
 func NewConfig(key []byte) *Config {
 	return &Config{
 		key:      key,
-		duration: 3600,
+		duration: 604800,
 		ipValid:  false,
 		owner:    "hzwy23",
 	}

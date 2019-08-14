@@ -23,10 +23,6 @@ type BasicAuthFilter struct {
 
 var BAFilter = NewBasicAuthFilter()
 
-func BasicAuth(r *http.Request) bool {
-	return BAFilter.basicAuth(r)
-}
-
 func AddConnUrl(url string) {
 	BAFilter.AddConnUrl(url)
 }
@@ -85,7 +81,7 @@ func (this *BasicAuthFilter) Identify(w http.ResponseWriter, r *http.Request) bo
 	if _, yes := this.filterConnUrl[r.URL.Path]; !yes {
 		if !jwt.ValidHttp(r) {
 			this.clock.RUnlock()
-			_ = hret.Error(w, 403, "您没有被授权访问API", r.URL.Path)
+			_ = hret.Error(w, 401, "登陆信息已经失效，请重新登陆", "登陆信息已经失效，请重新登陆")
 			return false
 		}
 	} else {
