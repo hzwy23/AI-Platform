@@ -13,11 +13,16 @@ type DeviceManageInfoDao interface {
 	FindByDeviceId(deviceId int) (entity.DeviceManageInfo, error)
 	FindBySerialNumber(serialNumber string) (entity.DeviceManageInfo, error)
 	LogicDeleteById(deviceId int) (int64, error)
+	Count() int64
 	Update(item entity.DeviceManageInfo) (int64, error)
 	Insert(item entity.DeviceManageInfo, GroupId string) (int64, error)
 }
 
 type deviceManageInfoDaoImpl struct {
+}
+
+func (r *deviceManageInfoDaoImpl) Count() int64 {
+	return dbobj.Count("select count(*) from device_manage_info where delete_status = 0")
 }
 
 func (r *deviceManageInfoDaoImpl) FindBySerialNumber(serialNumber string) (entity.DeviceManageInfo, error) {

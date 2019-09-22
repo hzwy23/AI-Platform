@@ -16,6 +16,7 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+	"time"
 )
 
 type MotoData struct {
@@ -200,6 +201,7 @@ func (r *RemoteDeviceController) GlobalSetting(resp http.ResponseWriter, req *ht
 	}
 	for _, item := range rst {
 		r.cmd(item.SerialNumber, req)
+		time.Sleep(time.Millisecond * 100)
 	}
 	hret.Success(resp, "Success")
 }

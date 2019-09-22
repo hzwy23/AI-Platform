@@ -19,10 +19,11 @@ func (r *HomePageController) Get(resp http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		logger.Error(err)
 	}
-	tCnt, offlineCnt, lampCnt := int64(0), int64(0), int64(0)
-	err = dbobj.QueryForObject("select count(*) from event_alarm_info where delete_status = 0 and handle_status = 0 and event_type_cd = ?", dbobj.PackArgs(1), &tCnt)
-	err = dbobj.QueryForObject("select count(*) from event_alarm_info where delete_status = 0 and handle_status = 0 and event_type_cd = ?", dbobj.PackArgs(2), &offlineCnt)
-	err = dbobj.QueryForObject("select count(*) from event_alarm_info where delete_status = 0 and handle_status = 0 and event_type_cd = ?", dbobj.PackArgs(3), &lampCnt)
+
+	tCnt := dbobj.Count("select count(*) from event_alarm_info where delete_status = 0 and handle_status = 0 and event_type_cd = ?", 1)
+	offlineCnt := dbobj.Count("select count(*) from event_alarm_info where delete_status = 0 and handle_status = 0 and event_type_cd = ?", 2)
+	lampCnt := dbobj.Count("select count(*) from event_alarm_info where delete_status = 0 and handle_status = 0 and event_type_cd = ?", 3)
+
 	rst, sCnt, err := r.srv.FindAll()
 	result := make(map[string]int64)
 	result["TotalPower"] = item

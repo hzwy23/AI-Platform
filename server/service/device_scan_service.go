@@ -8,17 +8,17 @@ import (
 )
 
 type DeviceScanService interface {
-	FindAll() ([]entity.DeviceScan, int, error)
+	FindAll() ([]entity.DeviceScan, int64, error)
 }
 
 type deviceScanServiceImpl struct {
 	deviceManageInfoDao dao.DeviceManageInfoDao
 }
 
-func (r *deviceScanServiceImpl) FindAll() ([]entity.DeviceScan, int, error) {
+func (r *deviceScanServiceImpl) FindAll() ([]entity.DeviceScan, int64, error) {
 	data := make([]entity.DeviceScan, 0)
 	ret, _ := listen.GetOnlineDevice()
-	idx := 0
+	idx := r.deviceManageInfoDao.Count()
 	for _, val := range ret {
 
 		address := ""
@@ -46,7 +46,6 @@ func (r *deviceScanServiceImpl) FindAll() ([]entity.DeviceScan, int, error) {
 
 		if err == nil && element.SerialNumber == val.SerialNumber {
 			item.IsAdded = true
-			idx += 1
 		}
 		data = append(data, item)
 	}

@@ -3,6 +3,7 @@ package controller
 import (
 	"ai-platform/api/entity"
 	"ai-platform/api/service"
+	"ai-platform/dbobj"
 	"ai-platform/panda"
 	"ai-platform/panda/hret"
 	"ai-platform/panda/jwt"
@@ -14,6 +15,18 @@ import (
 
 type DeviceInstallController struct {
 	service service.DeviceInstallInfoService
+}
+
+func (r *DeviceInstallController)GetDetails(resp http.ResponseWriter, req *http.Request)  {
+	req.ParseForm()
+	SerialNumber := req.FormValue("SerialNumber")
+
+	rst := entity.DeviceInstallInfo{}
+	err := dbobj.QueryForStruct("select id, serial_number, device_address, lat, lon from device_install_info where delete_status = 0 and serial_number = ?",&rst, SerialNumber)
+	if err != nil {
+		hret.Error(resp, 500701,"查询设备安装信息失败")
+	}
+	hret.Success(resp,rst)
 }
 
 func (r *DeviceInstallController) Get(resp http.ResponseWriter, req *http.Request) {
@@ -112,6 +125,7 @@ func init() {
 	ctl := &DeviceInstallController{
 		service: service.NewDeviceInstallService(),
 	}
+	route.Handler("GET", "/api/device/install/details", ctl.GetDetails)
 	route.Handler("GET", "/api/device/install", ctl.Get)
 	route.Handler("POST", "/api/device/install", ctl.Post)
 	route.Handler("PUT", "/api/device/install", ctl.Put)
