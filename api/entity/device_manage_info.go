@@ -59,4 +59,7 @@ type DeviceManageInfo struct {
 	GroupName string
 	// 爆闪时间（ms）
 	FlashDuration int
+
+	// 设备安装地址
+	DeviceAddress string
 }

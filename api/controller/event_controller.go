@@ -2,8 +2,11 @@ package controller
 
 import (
 	"ai-platform/api/dao"
+	"ai-platform/api/entity"
 	"ai-platform/panda/hret"
 	"ai-platform/panda/route"
+	"encoding/json"
+	"io/ioutil"
 	"net/http"
 )
 
@@ -41,6 +44,25 @@ func (r *EventController) Put(resp http.ResponseWriter, req *http.Request) {
 	hret.Success(resp, "Success")
 }
 
+func (r *EventController)Delete(resp http.ResponseWriter, req *http.Request) {
+	req.ParseForm();
+	body, err := ioutil.ReadAll(req.Body)
+	if err != nil {
+		hret.Error(resp, 500030, "添加设备失败，参数为空")
+		return
+	}
+	var rst []entity.EventAlarmInfo
+	err = json.Unmarshal(body,&rst)
+	if err != nil {
+		hret.Error(resp, 50060, "参数格式不正确，请联系管理员")
+		return
+	}
+	for _, item := range rst {
+		r.dao.LogicDeleteById(item.Id)
+	}
+	hret.Success(resp, "Success")
+}
+
 func init() {
 	ctl := EventController{
 		dao: dao.NewEventAlarmInfoDao(),
@@ -49,4 +71,5 @@ func init() {
 	route.Handler("GET", "/api/device/temperature", ctl.Get)
 	route.Handler("GET", "/api/device/lamp/exception", ctl.Get)
 	route.Handler("PUT", "/api/device/event", ctl.Put)
+	route.Handler("POST", "/api/device/lamp/remove/event", ctl.Delete)
 }

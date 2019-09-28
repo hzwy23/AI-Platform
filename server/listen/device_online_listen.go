@@ -37,7 +37,7 @@ var beatDuration int64
 // 获取在线设备信息
 func GetOnlineDevice() ([]OnlineDevice, error) {
 	var rst []OnlineDevice
-	err := dbobj.QueryForSlice("select serial_number, refresh_time, online_status, firmware_version, device_ip, mask, gateway_addr, device_port, mac_addr from device_scan_info", &rst)
+	err := dbobj.QueryForSlice("select serial_number, refresh_time, online_status, firmware_version, device_ip, mask, gateway_addr, device_port, mac_addr from device_scan_info order by device_ip", &rst)
 	return rst, err
 }
 
@@ -131,6 +131,7 @@ func init() {
 		beatDuration = 60
 	}
 	logger.Info("设备心跳保持时间是：", beatDuration)
+
 	go removeOfflineDevice()
 
 	go checkAddedDevice()

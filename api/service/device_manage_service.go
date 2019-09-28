@@ -12,6 +12,7 @@ type DeviceManageService interface {
 	AddDevice(item *entity.DeviceManageInfo, GroupId string) error
 	UpdateDevice(item entity.DeviceManageInfo) error
 	RemoveDevice(deviceId int) error
+	FindByDeviceId(deviceId int) (entity.DeviceManageInfo, error)
 }
 
 type deviceManageServiceImpl struct {
@@ -20,6 +21,10 @@ type deviceManageServiceImpl struct {
 
 func (r *deviceManageServiceImpl) FindAll(groupId string) ([]entity.DeviceManageInfo, error) {
 	return r.dao.FindAll(groupId)
+}
+
+func (r *deviceManageServiceImpl)FindByDeviceId(deviceId int) (entity.DeviceManageInfo, error)  {
+	return r.dao.FindByDeviceId(deviceId);
 }
 
 func (r *deviceManageServiceImpl) FindBySerialNumber(serialNumber string) (entity.DeviceManageInfo, error) {

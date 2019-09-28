@@ -7,10 +7,6 @@ import (
 	"testing"
 )
 
-func TestNewDeviceManageInfoDao(t *testing.T) {
-	r := dao.NewDeviceManageInfoDao()
-	fmt.Println(r.FindAll())
-}
 
 func TestDeviceManageInfoDaoImpl_LogicDeleteById(t *testing.T) {
 	r := dao.NewDeviceManageInfoDao()

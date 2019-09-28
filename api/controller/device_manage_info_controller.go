@@ -19,6 +19,7 @@ import (
 
 type DeviceManageInfoController struct {
 	service service.DeviceManageService
+	install service.DeviceInstallInfoService
 }
 
 const sqlText = `SELECT
@@ -33,6 +34,9 @@ WHERE
 	t.delete_status = 0 
 	AND not EXISTS ( SELECT 1 FROM group_device_bind b where t.device_id = b.device_id and delete_status = 0 )`
 
+
+// 查询指定分组内所有的设备信息
+// 如果设备分组为空，则查询所有已添加设备信息
 func (r *DeviceManageInfoController) Get(resp http.ResponseWriter, req *http.Request) {
 	req.ParseForm()
 	groupId := req.FormValue("GroupId")
@@ -92,6 +96,104 @@ func (r *DeviceManageInfoController) Post(resp http.ResponseWriter, req *http.Re
 		return
 	}
 
+	// 添加设备的同时，在设备安装列表中新增一条记录
+	arg := entity.DeviceInstallInfo{
+		SerialNumber:  item.SerialNumber,
+		DeviceAddress: "",
+		Lat:           "",
+		Lon:           "",
+		CreateDate:    panda.CurTime(),
+		UpdateDate:    panda.CurTime(),
+		CreateBy:      claim.UserId,
+		UpdateBy:      claim.UserId,
+		DeleteStatus:  0,
+	}
+	r.install.Insert(arg)
+
+	hret.Success(resp, "Success")
+}
+
+
+
+// 添加设备
+// 从扫描到的设备中，选择指定设备，添加到设备管理列表
+func (r *DeviceManageInfoController) BatchAdd(resp http.ResponseWriter, req *http.Request) {
+	req.ParseForm()
+
+	claim, err := jwt.ParseHttp(req)
+	if err != nil {
+		logger.Error(err)
+		hret.Error(resp, 403, "权限不足")
+		return
+	}
+
+	var params []vo.DeviceManageVo
+
+	body, err := ioutil.ReadAll(req.Body)
+	if err != nil {
+		logger.Error(err)
+		hret.Error(resp, 50030, "参数格式不正确")
+		return
+	}
+	err = json.Unmarshal(body, &params)
+	if err != nil {
+		logger.Error(err)
+		hret.Error(resp, 50031, "参数格式不正确")
+		return
+	}
+
+	for _, element := range params {
+		item := &entity.DeviceManageInfo{
+			// 设备序列号
+			SerialNumber: element.SerialNumber,
+			// 设备名称
+			DeviceName: "批量添加设备",
+			// 使用自动获取IP，0：否，1：是
+			//DhcpFlag: uint8(dhcp),
+			// 设备IP
+			DeviceIp: element.DeviceIp,
+			// 设备服务端口
+			DevicePort: element.DevicePort,
+
+			DeviceStatus: 1,
+
+			// MAC地址
+			MacAddress: element.MacAddr,
+			// 固件版本
+			FirmwareVersion: element.FirmwareVersion,
+
+			// 掩码
+			Mask: element.Mask,
+			// 网关
+			Gateway:      element.GatewayAddr,
+			CreateBy:     claim.UserId,
+			CreateDate:   panda.CurTime(),
+			UpdateBy:     claim.UserId,
+			UpdateDate:   panda.CurTime(),
+			DeleteStatus: 0,
+			Pin:          "123456",
+		}
+		err = r.service.AddDevice(item, "")
+		if err != nil {
+			hret.Error(resp, 500300, err.Error())
+			return
+		}
+
+		// 添加设备的同时，在设备安装列表中新增一条记录
+		arg := entity.DeviceInstallInfo{
+			SerialNumber:  item.SerialNumber,
+			DeviceAddress: "",
+			Lat:           "",
+			Lon:           "",
+			CreateDate:    panda.CurTime(),
+			UpdateDate:    panda.CurTime(),
+			CreateBy:      claim.UserId,
+			UpdateBy:      claim.UserId,
+			DeleteStatus:  0,
+		}
+		r.install.Insert(arg)
+	}
+
 	hret.Success(resp, "Success")
 }
 
@@ -103,11 +205,21 @@ func (r *DeviceManageInfoController) Delete(resp http.ResponseWriter, req *http.
 		hret.Error(resp, 500300, deviceId)
 		return
 	}
+
+	element, err := r.service.FindByDeviceId(sid)
+	if err != nil {
+		hret.Error(resp, 500500, err.Error())
+		return
+	}
+
 	err = r.service.RemoveDevice(sid)
 	if err != nil {
 		hret.Error(resp, 500500, err.Error())
 		return
 	}
+
+	dbobj.Exec("update device_install_info set delete_status = 1 where serial_number = ?", element.SerialNumber)
+
 	hret.Success(resp, "Success")
 }
 
@@ -199,10 +311,12 @@ func (r *DeviceManageInfoController) ChangeGroup(resp http.ResponseWriter, req *
 func init() {
 	ctl := &DeviceManageInfoController{
 		service: service.NewDeviceManageService(),
+		install: service.NewDeviceInstallService(),
 	}
 	route.Handler("GET", "/api/device/manage", ctl.Get)
 	route.Handler("GET", "/api/device/manage/ungroup", ctl.GetUnGroupDevice)
 	route.Handler("POST", "/api/device/manage", ctl.Post)
+	route.Handler("POST", "/api/device/manage/batch", ctl.BatchAdd)
 	route.Handler("POST", "/api/device/manage/group", ctl.UpdateDeviceGroup)
 	route.Handler("PUT", "/api/device/group/change", ctl.ChangeGroup)
 	route.DELETE("/api/device/manage/:deviceId", ctl.Delete)
