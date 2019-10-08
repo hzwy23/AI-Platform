@@ -179,14 +179,28 @@ func (r *RemoteDeviceController) GlobalSetting(resp http.ResponseWriter, req *ht
 		hret.Error(resp, 403, "权限不足")
 		return
 	}
-
 	if !panda.IsAdmin(claim.UserId) {
 		hret.Error(resp, 500500, "只有超级管理员才能进行统一设置")
 		return
 	}
 
-	req.ParseForm()
-	groupId := req.FormValue("GroupId")
+    // 参数解析
+	body, err := ioutil.ReadAll(req.Body)
+	if err != nil {
+		logger.Error("参数解析错误")
+		return
+	}
+	var tmp interface{}
+	err = json.Unmarshal(body, &tmp)
+	if err != nil {
+		return
+	}
+	args := make(map[string]interface{})
+	for key, val := range tmp.(map[string]interface{}) {
+		args[key] = val
+	}
+
+	groupId := strconv.Itoa(int(args["GroupId"].(float64)))
 	if len(groupId) == 0 {
 		hret.Error(resp, 500300, "设备分组为空，不能进行全局设置")
 		return
@@ -200,41 +214,29 @@ func (r *RemoteDeviceController) GlobalSetting(resp http.ResponseWriter, req *ht
 		return
 	}
 	for _, item := range rst {
-		r.cmd(item.SerialNumber, req)
+		r.cmd(item.SerialNumber, args)
 		time.Sleep(time.Millisecond * 100)
 	}
 	hret.Success(resp, "Success")
 }
 
-func (r *RemoteDeviceController) cmd(serialNumber string, req *http.Request) {
-
+func (r *RemoteDeviceController) cmd(serialNumber string, args map[string]interface{}) {
 	// 查看设备是否在线
 	item, err := r.deviceDao.FindBySerialNumber(serialNumber)
 	if err != nil || len(item.SerialNumber) == 0 {
+		fmt.Println("设备未添加到管理列表，无法进行设置操作", serialNumber)
 		logger.Warn("设备未添加到管理列表，不能进行修改", serialNumber)
 		return
-	}
-
-	body, err := ioutil.ReadAll(req.Body)
-	if err != nil {
-		return
-	}
-	var rst interface{}
-	err = json.Unmarshal(body, &rst)
-	if err != nil {
-		return
-	}
-	args := make(map[string]interface{})
-	for key, val := range rst.(map[string]interface{}) {
-		args[key] = val
 	}
 
 
 	err = updateDevice(serialNumber, args)
 	if err != nil {
-		logger.Warn("连接设备：", serialNumber, ",错误信息是：", err)
+		fmt.Println("[统一设置]连接设备：", serialNumber, ",错误信息是：", err)
+		logger.Warn("[统一设置]连接设备：", serialNumber, ",错误信息是：", err)
 		return
 	}
+
 
 	timer := make([]proto_data.DeviceTimerData,0)
 	for _, item := range args["Timer"].([]interface{}){
@@ -261,25 +263,15 @@ func (r *RemoteDeviceController) cmd(serialNumber string, req *http.Request) {
 		Timer: timer,
 	}
 
-	LightMode := req.FormValue("LightMode")
-	if LightMode == "1" {
-		cmd.LightMode = "CDS"
-	} else if LightMode == "2" {
-		cmd.LightMode = "Timer"
-	} else if LightMode == "3" {
-		cmd.LightMode = "All"
-	} else {
-		cmd.LightMode = "All"
-		LightMode = "3"
-	}
+	LightMode := args["LightMode"].(float64)
+	cmd.LightMode = strconv.Itoa(int(LightMode))
 
-
-	err = updateLightMode(serialNumber, cmd, LightMode)
+	err = updateLightMode(serialNumber, cmd, cmd.LightMode)
 	if err != nil {
 		logger.Warn("连接设备：", serialNumber, ",错误信息是：", err)
 		return
 	}
-
+	fmt.Println("[统一设置]设备",serialNumber,"统一成功")
 }
 
 // UpdateDeviceAttr 更新设备属性

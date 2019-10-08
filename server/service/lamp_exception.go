@@ -2,7 +2,6 @@ package service
 
 import (
 	"ai-platform/api/dao"
-	"ai-platform/api/service"
 	"ai-platform/dbobj"
 	"ai-platform/panda/logger"
 	"ai-platform/server/platform"
@@ -29,12 +28,12 @@ func lampException(context *platform.Context) (int, string) {
 		logger.Error(err)
 		return 0, err.Error()
 	}
-	_, err = dbobj.Exec("update device_manage_info set device_attribute = 2 where delete_status = 0 and serial_number = ?", data.SerialNumber)
+	_, err = dbobj.Exec("update device_manage_info set device_status = 2 where delete_status = 0 and serial_number = ?", data.SerialNumber)
 	logger.Info("生成灯珠异常告警信息,", data)
 	if err != nil {
 		return 500, err.Error()
 	}
-	service.AddAlarmEvent(data.SerialNumber, 3)
+	dao.AddAlarmEvent(data.SerialNumber, 3)
 	return 200, "Success"
 }
 

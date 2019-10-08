@@ -1,8 +1,8 @@
 package controller
 
 import (
+	"ai-platform/api/dao"
 	"ai-platform/api/entity"
-	"ai-platform/api/service"
 	"ai-platform/panda"
 	"ai-platform/panda/hret"
 	"ai-platform/panda/jwt"
@@ -13,7 +13,7 @@ import (
 )
 
 type GroupDeviceController struct {
-	groupDeviceService service.GroupDeviceService
+	groupDeviceService dao.GroupDeviceService
 }
 
 func (r *GroupDeviceController) Get(resp http.ResponseWriter, req *http.Request) {
@@ -105,7 +105,7 @@ func (r *GroupDeviceController) Delete(resp http.ResponseWriter, req *http.Reque
 func init() {
 	logger.Info("注册分组控制模块")
 	handleFunc := &GroupDeviceController{
-		groupDeviceService: service.NewGroupDeviceService(),
+		groupDeviceService: dao.NewGroupDeviceService(),
 	}
 	route.Handler("GET", "/api/device/group", handleFunc.Get)
 	route.Handler("POST", "/api/device/group", handleFunc.Post)

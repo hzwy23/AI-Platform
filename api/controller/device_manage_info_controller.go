@@ -1,8 +1,8 @@
 package controller
 
 import (
+	"ai-platform/api/dao"
 	"ai-platform/api/entity"
-	"ai-platform/api/service"
 	"ai-platform/api/vo"
 	"ai-platform/dbobj"
 	"ai-platform/panda"
@@ -18,8 +18,8 @@ import (
 )
 
 type DeviceManageInfoController struct {
-	service service.DeviceManageService
-	install service.DeviceInstallInfoService
+	service dao.DeviceManageService
+	install dao.DeviceInstallInfoService
 }
 
 const sqlText = `SELECT
@@ -218,7 +218,11 @@ func (r *DeviceManageInfoController) Delete(resp http.ResponseWriter, req *http.
 		return
 	}
 
+	// 删除设备的时候，移除设备安装位置信息
 	dbobj.Exec("update device_install_info set delete_status = 1 where serial_number = ?", element.SerialNumber)
+
+	// 删除设备的时候时候要，清除设备的所有清高信息
+	dbobj.Exec("update event_alarm_info set delete_status = 1 where serial_number = ?", element.SerialNumber)
 
 	hret.Success(resp, "Success")
 }
@@ -310,8 +314,8 @@ func (r *DeviceManageInfoController) ChangeGroup(resp http.ResponseWriter, req *
 
 func init() {
 	ctl := &DeviceManageInfoController{
-		service: service.NewDeviceManageService(),
-		install: service.NewDeviceInstallService(),
+		service: dao.NewDeviceManageService(),
+		install: dao.NewDeviceInstallService(),
 	}
 	route.Handler("GET", "/api/device/manage", ctl.Get)
 	route.Handler("GET", "/api/device/manage/ungroup", ctl.GetUnGroupDevice)

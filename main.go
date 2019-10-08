@@ -3,6 +3,7 @@ package main
 import (
 	"ai-platform/api"
 	"ai-platform/api/auth"
+	_ "ai-platform/panda/cron"
 	"ai-platform/server"
 )
 

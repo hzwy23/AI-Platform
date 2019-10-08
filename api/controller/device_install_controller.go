@@ -1,8 +1,8 @@
 package controller
 
 import (
+	"ai-platform/api/dao"
 	"ai-platform/api/entity"
-	"ai-platform/api/service"
 	"ai-platform/dbobj"
 	"ai-platform/panda"
 	"ai-platform/panda/hret"
@@ -14,7 +14,7 @@ import (
 )
 
 type DeviceInstallController struct {
-	service service.DeviceInstallInfoService
+	service dao.DeviceInstallInfoService
 }
 
 func (r *DeviceInstallController)GetDetails(resp http.ResponseWriter, req *http.Request)  {
@@ -123,7 +123,7 @@ func (r *DeviceInstallController) Delete(resp http.ResponseWriter, req *http.Req
 
 func init() {
 	ctl := &DeviceInstallController{
-		service: service.NewDeviceInstallService(),
+		service: dao.NewDeviceInstallService(),
 	}
 	route.Handler("GET", "/api/device/install/details", ctl.GetDetails)
 	route.Handler("GET", "/api/device/install", ctl.Get)

@@ -1,7 +1,7 @@
 package listen
 
 import (
-	"ai-platform/api/service"
+	"ai-platform/api/dao"
 	"ai-platform/dbobj"
 	"ai-platform/panda/logger"
 	"ai-platform/server/proto_data"
@@ -17,7 +17,7 @@ func CheckTemperature(device proto_data.DeviceAttribute) {
 		dbobj.Exec("update device_manage_info set device_status = 3 where serial_number = ? and delete_status = 0", device.SerialNumber)
 		logger.Warn("温度异常，设置设别状态为温度异常，并生成告警信息")
 		// 产生告警日志
-		service.AddAlarmEvent(device.SerialNumber, 1)
+		dao.AddAlarmEvent(device.SerialNumber, 1)
 	}
 }
 

@@ -2,7 +2,6 @@ package listen
 
 import (
 	"ai-platform/api/dao"
-	"ai-platform/api/service"
 	"ai-platform/dbobj"
 	"ai-platform/panda/hret"
 	"ai-platform/panda/logger"
@@ -90,7 +89,7 @@ func removeOfflineDevice() {
 			if duration > beatDuration {
 				logger.Info("从设备扫描列表中删除设备", val.SerialNumber)
 				dbobj.Exec("delete from device_scan_info where serial_number = ?", val.SerialNumber)
-				service.AddAlarmEvent(val.SerialNumber, 2)
+				dao.AddAlarmEvent(val.SerialNumber, 2)
 			}
 		}
 		logger.Info("sync device status")
@@ -110,7 +109,7 @@ func checkAddedDevice()  {
 			var cnt = 0
 			err = dbobj.QueryForObject("select count(*) from device_scan_info where serial_number = ?", dbobj.PackArgs(item.SerialNumber), &cnt)
 			if err != nil || cnt == 0 {
-				service.AddAlarmEvent(item.SerialNumber, 2)			}
+				dao.AddAlarmEvent(item.SerialNumber, 2)			}
 		}
 		time.Sleep(time.Second*10)
 	}
