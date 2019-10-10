@@ -4,7 +4,9 @@ import (
 	"ai-platform/api/dao"
 	"ai-platform/panda/hret"
 	"ai-platform/panda/route"
+	"ai-platform/server/listen"
 	"net/http"
+	"strconv"
 )
 
 type SysGlobalConfigController struct {
@@ -24,11 +26,24 @@ func (r *SysGlobalConfigController) Put(resp http.ResponseWriter, req *http.Requ
 	req.ParseForm()
 	itemId := req.FormValue("ItemId")
 	itemValue := req.FormValue("ItemValue")
+
+	// 修改温度告警阀值
+
+	if itemId == "3" {
+		t, err := strconv.ParseFloat(itemValue,32)
+		if err != nil {
+			hret.Error(resp, 500232, err.Error())
+			return
+		}
+		listen.UpdateWarnTemperature(int(t))
+	}
+
 	_, err := r.dao.Update(itemValue, itemId)
 	if err != nil {
 		hret.Error(resp, 500232, err.Error())
 		return
 	}
+
 	hret.Success(resp, "Success")
 }
 
