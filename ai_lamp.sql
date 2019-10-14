@@ -5,13 +5,13 @@
  Source Server Type    : MySQL
  Source Server Version : 100117
  Source Host           : 121.42.143.130:3306
- Source Schema         : ai_lamp
+ Source Schema         : ai_lamp_uat
 
  Target Server Type    : MySQL
  Target Server Version : 100117
  File Encoding         : 65001
 
- Date: 11/08/2019 08:31:54
+ Date: 12/10/2019 23:19:08
 */
 
 SET NAMES utf8mb4;
@@ -64,17 +64,15 @@ CREATE TABLE `device_manage_info` (
   `device_status` varchar(255) DEFAULT NULL COMMENT '设备状态',
   `device_attribute` varchar(255) DEFAULT NULL COMMENT '设备属性',
   `device_power` varchar(255) DEFAULT NULL COMMENT '设备功率',
-  `device_light_threshold` varchar(255) DEFAULT NULL COMMENT '光敏阀值',
+  `device_light_threshold` varchar(255) DEFAULT '0' COMMENT '光敏阀值',
   `device_brightness` varchar(255) DEFAULT NULL COMMENT '亮度',
   `device_temperature` varchar(255) DEFAULT NULL COMMENT '设备温度',
-  `auto_start_time` varchar(20) DEFAULT NULL,
-  `auto_end_time` varchar(20) DEFAULT NULL,
+  `auto_start_time` varchar(120) DEFAULT NULL,
+  `auto_end_time` varchar(120) DEFAULT NULL,
   `light_mode` varchar(255) DEFAULT NULL COMMENT '补光模式',
   `flash_duration` int(255) DEFAULT NULL COMMENT '爆闪时间（ms）',
   `mac_address` varchar(255) DEFAULT NULL COMMENT 'MAC地址',
   `firmware_version` varchar(255) DEFAULT NULL,
-  `longitude` varchar(255) DEFAULT NULL,
-  `latitude` varchar(255) DEFAULT NULL,
   `mask` varchar(255) DEFAULT NULL,
   `gateway` varchar(255) DEFAULT NULL COMMENT '网关',
   `pin` varchar(255) DEFAULT NULL,
@@ -190,7 +188,8 @@ CREATE TABLE `sys_global_config` (
 BEGIN;
 INSERT INTO `sys_global_config` VALUES (1, '广播地址', '0.0.0.0');
 INSERT INTO `sys_global_config` VALUES (2, '广播端口', '8900');
-INSERT INTO `sys_global_config` VALUES (3, '温度阀值', '80');
+INSERT INTO `sys_global_config` VALUES (3, '温度阀值', '70');
+INSERT INTO `sys_global_config` VALUES (4, '设备心跳时长', '10');
 COMMIT;
 
 -- ----------------------------
@@ -215,9 +214,14 @@ CREATE TABLE `sys_user_info` (
 -- Records of sys_user_info
 -- ----------------------------
 BEGIN;
-INSERT INTO `sys_user_info` VALUES ('admin', 'e10adc3949ba59abbe56e057f20f883e', '超级管理员', '最高权限', '10000000000', '/ui/avatar.png', 'ai', '260979971', 'hzwy23@163.com', 0);
-INSERT INTO `sys_user_info` VALUES ('inspector', 'e10adc3949ba59abbe56e057f20f883e', '巡视人员', '巡视人员', '10000000000', '/ui/avatar.png', 'ai-lamp', '260979971', 'hzwy23@163.com', 0);
-INSERT INTO `sys_user_info` VALUES ('operation', 'e10adc3949ba59abbe56e057f20f883e', '运维管理员', '日常运维', '10000000000', '/ui/avatar.png', 'ai-lamp', '260979971', 'hzwy23@163.com', 0);
+INSERT INTO `sys_user_info` VALUES ('', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO `sys_user_info` VALUES ('admin', 'e10adc3949ba59abbe56e057f20f883e', '系统管理员', '最高权限', '10000000000', '/ui/avatar.png', 'ai', '260979971', 'hzwy23@163.com', 0);
+INSERT INTO `sys_user_info` VALUES ('inspector', 'e10adc3949ba59abbe56e057f20f883e', '巡视员', '巡视人员', '10000000000', '/ui/avatar.png', 'ai-lamp', '260979971', 'hzwy23@163.com', 0);
+INSERT INTO `sys_user_info` VALUES ('inspector1', 'e10adc3949ba59abbe56e057f20f883e', '巡视员A', '巡视人员', NULL, NULL, NULL, NULL, NULL, 0);
+INSERT INTO `sys_user_info` VALUES ('inspector2', 'e10adc3949ba59abbe56e057f20f883e', '巡视员B', '巡视人员', NULL, '/ui/avatar.png', NULL, NULL, NULL, 0);
+INSERT INTO `sys_user_info` VALUES ('operation', 'e10adc3949ba59abbe56e057f20f883e', '运维员', '日常运维', '10000000000', '/ui/avatar.png', 'ai-lamp', '260979971', 'hzwy23@163.com', 0);
+INSERT INTO `sys_user_info` VALUES ('operation1', 'e10adc3949ba59abbe56e057f20f883e', '运维A', '日常运维', NULL, '/ui/avatar.png', NULL, NULL, NULL, 0);
+INSERT INTO `sys_user_info` VALUES ('operation2', 'e10adc3949ba59abbe56e057f20f883e', '运维B', '日常运维', NULL, '/ui/avatar.png', NULL, NULL, NULL, 0);
 COMMIT;
 
 SET FOREIGN_KEY_CHECKS = 1;
