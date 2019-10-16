@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"ai-platform/dbobj"
 	"ai-platform/api/dao"
 	"ai-platform/api/entity"
 	"ai-platform/panda/hret"
@@ -8,6 +9,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 )
 
 type EventController struct {
@@ -36,6 +38,22 @@ func (r *EventController) Put(resp http.ResponseWriter, req *http.Request) {
 		hret.Error(resp, 500300, "无效的事件")
 		return
 	}
+
+	eventTypeCd := req.FormValue("eventTypeCd")
+
+	if eventTypeCd == "3" {
+		// 取消灯珠异常
+		td, _ := strconv.Atoi(eventTypeCd)
+		item, err := r.dao.FindById(td)
+
+		if err != nil {
+			hret.Error(resp, 500301, "记录不存在")
+			return
+		}
+		dbobj.Exec("update device_manage_info set device_status = concat(substr(device_status,1,1), 1, substr(device_status,3,1)) where serial_number = ? and delete_status = 0", item.SerialNumber)
+	}
+
+
 	_, err := r.dao.CloseById(1, Id)
 	if err != nil {
 		hret.Error(resp, 500030, err.Error())
@@ -48,7 +66,7 @@ func (r *EventController)Delete(resp http.ResponseWriter, req *http.Request) {
 	req.ParseForm();
 	body, err := ioutil.ReadAll(req.Body)
 	if err != nil {
-		hret.Error(resp, 500030, "添加设备失败，参数为空")
+		hret.Error(resp, 500030, "参数解析失败，请联系管理员")
 		return
 	}
 	var rst []entity.EventAlarmInfo

@@ -63,9 +63,9 @@ func (r *deviceManageInfoDaoImpl) LogicDeleteById(deviceId int) (int64, error) {
 }
 
 func (r *deviceManageInfoDaoImpl) Update(item entity.DeviceManageInfo) (int64, error) {
-	result, err := dbobj.Exec("update device_manage_info set device_name = ?, dhcp_flag = ?, device_ip = ?, device_port = ?, device_status = ?, device_attribute = ?, device_power = ?, device_light_threshold = ?, device_brightness = ?, device_temperature = ?, auto_start_time = ?, auto_end_time = ?, light_mode = ?, mac_address = ?, firmware_version = ?, mask = ?, gateway = ?, pin = ?, update_by = ?, update_data = ?, power_total = ?, strobe_count = ? where delete_status = 0 and device_id = ?",
+	result, err := dbobj.Exec("update device_manage_info set device_name = ?, dhcp_flag = ?, device_ip = ?, device_port = ?, device_attribute = ?, device_power = ?, device_light_threshold = ?, device_brightness = ?, device_temperature = ?, auto_start_time = ?, auto_end_time = ?, light_mode = ?, mac_address = ?, firmware_version = ?, mask = ?, gateway = ?, pin = ?, update_by = ?, update_data = ?, power_total = ?, strobe_count = ? where delete_status = 0 and device_id = ?",
 		item.DeviceName, item.DhcpFlag, item.DeviceIp,
-		item.DevicePort, item.DeviceStatus, item.DeviceAttribute,
+		item.DevicePort, item.DeviceAttribute,
 		item.DevicePower, item.DeviceLightThreshold, item.DeviceBrightness,
 		item.DeviceTemperature, item.AutoStartTime, item.AutoEndTime,
 		item.LightMode, item.MacAddress, item.FirmwareVersion,
@@ -88,7 +88,7 @@ func (r *deviceManageInfoDaoImpl) Insert(item entity.DeviceManageInfo, GroupId s
 	result, err := tx.Exec("insert into device_manage_info(device_id, serial_number, device_name, dhcp_flag, device_ip, device_port, device_status, device_attribute, device_power, device_light_threshold, device_brightness, device_temperature, auto_start_time, auto_end_time, light_mode, mac_address, firmware_version, mask, gateway, pin, create_by, create_date, update_by, update_data, delete_status, power_total, strobe_count, flash_duration) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
 		item.DeviceId, item.SerialNumber, item.DeviceName,
 		item.DhcpFlag, item.DeviceIp, item.DevicePort,
-		item.DeviceStatus, item.DeviceAttribute,
+		"111", item.DeviceAttribute,
 		item.DevicePower, item.DeviceLightThreshold, item.DeviceBrightness,
 		item.DeviceTemperature, item.AutoStartTime, item.AutoEndTime,
 		item.LightMode, item.MacAddress, item.FirmwareVersion,

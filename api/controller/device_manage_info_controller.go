@@ -72,7 +72,7 @@ func (r *DeviceManageInfoController) Post(resp http.ResponseWriter, req *http.Re
 		// 设备服务端口
 		DevicePort: req.FormValue("DevicePort"),
 
-		DeviceStatus: 1,
+		DeviceStatus: "111",
 
 		// MAC地址
 		MacAddress: req.FormValue("MacAddress"),
@@ -155,7 +155,7 @@ func (r *DeviceManageInfoController) BatchAdd(resp http.ResponseWriter, req *htt
 			// 设备服务端口
 			DevicePort: element.DevicePort,
 
-			DeviceStatus: 1,
+			DeviceStatus: "111",
 
 			// MAC地址
 			MacAddress: element.MacAddr,

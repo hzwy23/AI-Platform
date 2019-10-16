@@ -33,6 +33,10 @@ var device dao.DeviceManageInfoDao
 var alarm dao.EventAlarmInfoDao
 var beatDuration int64
 
+func ChangeHeartbeat(heartbeat int64){
+	beatDuration = heartbeat
+}
+
 // 获取在线设备信息
 func GetOnlineDevice() ([]OnlineDevice, error) {
 	var rst []OnlineDevice
@@ -65,7 +69,7 @@ func UpdateOnlineDevice(key string, element *OnlineDevice) {
 	}
 
 	// 设置设备上线
-	dbobj.Exec("update device_manage_info set device_status = 1 where serial_number = ? and delete_status = 0", key)
+	dbobj.Exec("update device_manage_info set device_status = concat(1, substr(device_status,2,2)) where serial_number = ? and delete_status = 0", key)
 
 	// 取消离线告警
 	alarm.ChangeHandleStatus(key, 2)
@@ -109,7 +113,8 @@ func checkAddedDevice()  {
 			var cnt = 0
 			err = dbobj.QueryForObject("select count(*) from device_scan_info where serial_number = ?", dbobj.PackArgs(item.SerialNumber), &cnt)
 			if err != nil || cnt == 0 {
-				dao.AddAlarmEvent(item.SerialNumber, 2)			}
+				dao.AddAlarmEvent(item.SerialNumber, 2)			
+			}
 		}
 		time.Sleep(time.Second*10)
 	}

@@ -1,11 +1,11 @@
 self.__precacheManifest = [
   {
-    "revision": "df75c8c2bdd880408f50",
+    "revision": "ce21d0d222207f341c3a",
     "url": "/ui/vendors.3d6c8b85.chunk.css"
   },
   {
-    "revision": "df75c8c2bdd880408f50",
-    "url": "/ui/vendors.90a06a6f.async.js"
+    "revision": "ce21d0d222207f341c3a",
+    "url": "/ui/vendors.c39ffadc.async.js"
   },
   {
     "revision": "e81d9f02e451dedd755a",
@@ -72,12 +72,12 @@ self.__precacheManifest = [
     "url": "/ui/p__Device__Manage__EditDevice.6a2a4eeb.async.js"
   },
   {
-    "revision": "d843c5ce2c1cced97a21",
+    "revision": "9d557a84d85e50e2f223",
     "url": "/ui/p__Device__Manage__Index.837304f1.chunk.css"
   },
   {
-    "revision": "d843c5ce2c1cced97a21",
-    "url": "/ui/p__Device__Manage__Index.99162540.async.js"
+    "revision": "9d557a84d85e50e2f223",
+    "url": "/ui/p__Device__Manage__Index.71e985e5.async.js"
   },
   {
     "revision": "ed1b16f4d3b091254cdc",
@@ -96,28 +96,28 @@ self.__precacheManifest = [
     "url": "/ui/p__Device__Scan__Index.f5f2795f.async.js"
   },
   {
-    "revision": "66fe0fcdc66cfb22d7af",
+    "revision": "26557e92c75b0d15e9aa",
     "url": "/ui/p__Event__Lamp__Index.10f92f8f.chunk.css"
   },
   {
-    "revision": "66fe0fcdc66cfb22d7af",
-    "url": "/ui/p__Event__Lamp__Index.b5e3e645.async.js"
+    "revision": "26557e92c75b0d15e9aa",
+    "url": "/ui/p__Event__Lamp__Index.27240f0a.async.js"
   },
   {
-    "revision": "f7379062c1c304ad2e6e",
+    "revision": "e06a68eaee70a026dd29",
     "url": "/ui/p__Event__Offline__Index.797181e9.chunk.css"
   },
   {
-    "revision": "f7379062c1c304ad2e6e",
-    "url": "/ui/p__Event__Offline__Index.337e8fd4.async.js"
+    "revision": "e06a68eaee70a026dd29",
+    "url": "/ui/p__Event__Offline__Index.3bcb5193.async.js"
   },
   {
-    "revision": "ab89e8f83618c086291e",
+    "revision": "cd7c465450b8aec83f06",
     "url": "/ui/p__Event__Temperature__Index.8505c0c1.chunk.css"
   },
   {
-    "revision": "ab89e8f83618c086291e",
-    "url": "/ui/p__Event__Temperature__Index.fc57555e.async.js"
+    "revision": "cd7c465450b8aec83f06",
+    "url": "/ui/p__Event__Temperature__Index.2eca622c.async.js"
   },
   {
     "revision": "8b83bfe780a9551385fa",
@@ -176,28 +176,40 @@ self.__precacheManifest = [
     "url": "/ui/p__Welcome.97c2abc1.async.js"
   },
   {
-    "revision": "65e96ec505b6795af30c",
+    "revision": "21109a1fd89b35364387",
     "url": "/ui/umi.65fe7970.css"
   },
   {
-    "revision": "65e96ec505b6795af30c",
-    "url": "/ui/umi.4321a4a1.js"
+    "revision": "21109a1fd89b35364387",
+    "url": "/ui/umi.e984a934.js"
   },
   {
     "revision": "499769128fd73adf00b894650ebf97e4",
     "url": "/ui/static/logo.49976912.png"
   },
   {
-    "revision": "43de1effeb012eb4d08bae5652b704fc",
+    "revision": "fec31c0f8b635f3af66d69d125b00303",
     "url": "/ui/index.html"
   },
   {
-    "revision": "194577a7e20bdcc7afbb718f502c134c",
-    "url": "/ui/.DS_Store"
+    "revision": "c23aa881b8d0e959f6c0aeb5ae7e4baa",
+    "url": "/ui/icons/icon-192x192.png"
   },
   {
     "revision": "694c4300be571fdd4d8b6abbe14d2e3f",
     "url": "/ui/favicon.png"
+  },
+  {
+    "revision": "347329d0982682b42d40c8162817a940",
+    "url": "/ui/icons/icon-128x128.png"
+  },
+  {
+    "revision": "5661ce8e2472d2727e8fd0390b22ba37",
+    "url": "/ui/icons/icon-512x512.png"
+  },
+  {
+    "revision": "b285be5f5e4f6c4fea04c09783712940",
+    "url": "/ui/normal.png"
   },
   {
     "revision": "e147bdebf32ef9cb7ce137ed0ed5d3a6",
@@ -208,24 +220,12 @@ self.__precacheManifest = [
     "url": "/ui/bad.png"
   },
   {
+    "revision": "194577a7e20bdcc7afbb718f502c134c",
+    "url": "/ui/.DS_Store"
+  },
+  {
     "revision": "b1994b4d200f6f5de9b8c7577bcc6d14",
     "url": "/ui/right.png"
-  },
-  {
-    "revision": "c23aa881b8d0e959f6c0aeb5ae7e4baa",
-    "url": "/ui/icons/icon-192x192.png"
-  },
-  {
-    "revision": "5661ce8e2472d2727e8fd0390b22ba37",
-    "url": "/ui/icons/icon-512x512.png"
-  },
-  {
-    "revision": "347329d0982682b42d40c8162817a940",
-    "url": "/ui/icons/icon-128x128.png"
-  },
-  {
-    "revision": "b285be5f5e4f6c4fea04c09783712940",
-    "url": "/ui/normal.png"
   },
   {
     "revision": "32ebaab97324e0ef4b91a6136dd3ce44",

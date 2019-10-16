@@ -13,7 +13,7 @@ type DeviceManageInfo struct {
 	// 设备服务端口
 	DevicePort string
 	// 设备状态，平台使用，设备不使用
-	DeviceStatus uint8
+	DeviceStatus string
 	// 设备属性
 	DeviceAttribute uint8
 	// 设备功率

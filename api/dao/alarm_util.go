@@ -20,16 +20,20 @@ func AddAlarmEvent(key string, eventTypeCd int) {
 		return
 	}
 
-	status := 1
 	if eventTypeCd == 1 {
-		status = 3
+		// 温度异常
+		fmt.Println("温度异常:",eventTypeCd, key)
+		dbobj.Exec("update device_manage_info set device_status = concat(substr(device_status,1,2), 4) where serial_number = ? and delete_status = 0", key)
 	} else if eventTypeCd == 2 {
-		status = 4
+		// 设备离线
+		fmt.Println("设备离线:", eventTypeCd, key)
+		dbobj.Exec("update device_manage_info set device_status = concat(4, substr(device_status,2,2)) where serial_number = ? and delete_status = 0", key)
 	} else if eventTypeCd == 3 {
-		status = 2
-	}
+		// 灯珠异常
+		fmt.Println("灯珠异常:", eventTypeCd, key)
+		dbobj.Exec("update device_manage_info set device_status = concat(substr(device_status,1,1), 4, substr(device_status,3,1)) where serial_number = ? and delete_status = 0", key)
+	} 
 
-	dbobj.Exec("update device_manage_info set device_status = ? where serial_number = ? and delete_status = 0", status, key)
 	logger.Info("产生异常事件，设备号是：", key, ",事件类型是：", eventTypeCd)
 	// 检查设备是否存在未处理的异常
 	var cnt = 0
