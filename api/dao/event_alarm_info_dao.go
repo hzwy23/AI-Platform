@@ -46,6 +46,7 @@ func (r *eventAlarmInfoDaoImpl) Update(item entity.EventAlarmInfo) (int64, error
 	return size, err
 }
 
+// 关闭警告信息
 func (r *eventAlarmInfoDaoImpl) CloseById(status int, id string) (int64, error) {
 	result, err := dbobj.Exec("update event_alarm_info set handle_status = ? where id = ?", status, id)
 	if result == nil {
@@ -73,8 +74,10 @@ func (r *eventAlarmInfoDaoImpl) FindById(id int) (entity.EventAlarmInfo, error) 
 	return rst, err
 }
 
+// 删除已经处理过的警告记录，
+// 未处理过的警告记录，不能删除
 func (r *eventAlarmInfoDaoImpl) LogicDeleteById(id int) (int64, error) {
-	result, err := dbobj.Exec("update event_alarm_info set delete_status = 1 where id = ?", id)
+	result, err := dbobj.Exec("update event_alarm_info set delete_status = 1 where id = ? and handle_status = 1", id)
 	if result == nil {
 		return 0, err
 	}

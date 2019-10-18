@@ -1,11 +1,11 @@
 self.__precacheManifest = [
   {
-    "revision": "ce21d0d222207f341c3a",
+    "revision": "bd4c3f13902d55d38cac",
     "url": "/ui/vendors.3d6c8b85.chunk.css"
   },
   {
-    "revision": "ce21d0d222207f341c3a",
-    "url": "/ui/vendors.c39ffadc.async.js"
+    "revision": "bd4c3f13902d55d38cac",
+    "url": "/ui/vendors.97f31d6e.async.js"
   },
   {
     "revision": "e81d9f02e451dedd755a",
@@ -72,12 +72,12 @@ self.__precacheManifest = [
     "url": "/ui/p__Device__Manage__EditDevice.6a2a4eeb.async.js"
   },
   {
-    "revision": "9d557a84d85e50e2f223",
+    "revision": "1989c86975ba2dcc5b43",
     "url": "/ui/p__Device__Manage__Index.837304f1.chunk.css"
   },
   {
-    "revision": "9d557a84d85e50e2f223",
-    "url": "/ui/p__Device__Manage__Index.71e985e5.async.js"
+    "revision": "1989c86975ba2dcc5b43",
+    "url": "/ui/p__Device__Manage__Index.41a7ad58.async.js"
   },
   {
     "revision": "ed1b16f4d3b091254cdc",
@@ -88,36 +88,36 @@ self.__precacheManifest = [
     "url": "/ui/p__Device__Scan__EditDeviceNetwork.92f4cab5.async.js"
   },
   {
-    "revision": "633eecd89313e1683ac4",
+    "revision": "dbed96884c087469bfdd",
     "url": "/ui/p__Device__Scan__Index.a7b966f7.chunk.css"
   },
   {
-    "revision": "633eecd89313e1683ac4",
-    "url": "/ui/p__Device__Scan__Index.f5f2795f.async.js"
+    "revision": "dbed96884c087469bfdd",
+    "url": "/ui/p__Device__Scan__Index.076d8175.async.js"
   },
   {
-    "revision": "26557e92c75b0d15e9aa",
+    "revision": "6ffc7e3ea4c2b617ba75",
     "url": "/ui/p__Event__Lamp__Index.10f92f8f.chunk.css"
   },
   {
-    "revision": "26557e92c75b0d15e9aa",
-    "url": "/ui/p__Event__Lamp__Index.27240f0a.async.js"
+    "revision": "6ffc7e3ea4c2b617ba75",
+    "url": "/ui/p__Event__Lamp__Index.03a85dcd.async.js"
   },
   {
-    "revision": "e06a68eaee70a026dd29",
+    "revision": "4f95d5d4332ae841c5f5",
     "url": "/ui/p__Event__Offline__Index.797181e9.chunk.css"
   },
   {
-    "revision": "e06a68eaee70a026dd29",
-    "url": "/ui/p__Event__Offline__Index.3bcb5193.async.js"
+    "revision": "4f95d5d4332ae841c5f5",
+    "url": "/ui/p__Event__Offline__Index.18518126.async.js"
   },
   {
-    "revision": "cd7c465450b8aec83f06",
+    "revision": "e03876c682c606f748a6",
     "url": "/ui/p__Event__Temperature__Index.8505c0c1.chunk.css"
   },
   {
-    "revision": "cd7c465450b8aec83f06",
-    "url": "/ui/p__Event__Temperature__Index.2eca622c.async.js"
+    "revision": "e03876c682c606f748a6",
+    "url": "/ui/p__Event__Temperature__Index.bb0535ca.async.js"
   },
   {
     "revision": "8b83bfe780a9551385fa",
@@ -168,64 +168,64 @@ self.__precacheManifest = [
     "url": "/ui/p__User__Profiles__Index.87bb1cd4.async.js"
   },
   {
-    "revision": "ef2f37dbd92126178dd3",
+    "revision": "6804ed90b483c6562197",
     "url": "/ui/p__Welcome.4b08a5c0.chunk.css"
   },
   {
-    "revision": "ef2f37dbd92126178dd3",
-    "url": "/ui/p__Welcome.97c2abc1.async.js"
+    "revision": "6804ed90b483c6562197",
+    "url": "/ui/p__Welcome.f723abd6.async.js"
   },
   {
-    "revision": "21109a1fd89b35364387",
+    "revision": "970d039bd7544b1bda2b",
     "url": "/ui/umi.65fe7970.css"
   },
   {
-    "revision": "21109a1fd89b35364387",
-    "url": "/ui/umi.e984a934.js"
+    "revision": "970d039bd7544b1bda2b",
+    "url": "/ui/umi.9eb437e8.js"
   },
   {
     "revision": "499769128fd73adf00b894650ebf97e4",
     "url": "/ui/static/logo.49976912.png"
   },
   {
-    "revision": "fec31c0f8b635f3af66d69d125b00303",
+    "revision": "a8603c841984070b33a04c6651746c31",
     "url": "/ui/index.html"
-  },
-  {
-    "revision": "c23aa881b8d0e959f6c0aeb5ae7e4baa",
-    "url": "/ui/icons/icon-192x192.png"
   },
   {
     "revision": "694c4300be571fdd4d8b6abbe14d2e3f",
     "url": "/ui/favicon.png"
   },
   {
-    "revision": "347329d0982682b42d40c8162817a940",
-    "url": "/ui/icons/icon-128x128.png"
+    "revision": "e147bdebf32ef9cb7ce137ed0ed5d3a6",
+    "url": "/ui/avatar.png"
   },
   {
-    "revision": "5661ce8e2472d2727e8fd0390b22ba37",
-    "url": "/ui/icons/icon-512x512.png"
+    "revision": "c23aa881b8d0e959f6c0aeb5ae7e4baa",
+    "url": "/ui/icons/icon-192x192.png"
   },
   {
     "revision": "b285be5f5e4f6c4fea04c09783712940",
     "url": "/ui/normal.png"
   },
   {
-    "revision": "e147bdebf32ef9cb7ce137ed0ed5d3a6",
-    "url": "/ui/avatar.png"
+    "revision": "5661ce8e2472d2727e8fd0390b22ba37",
+    "url": "/ui/icons/icon-512x512.png"
   },
   {
-    "revision": "4c0f1c8b54384f15e32bea691ea91acd",
-    "url": "/ui/bad.png"
+    "revision": "b1994b4d200f6f5de9b8c7577bcc6d14",
+    "url": "/ui/right.png"
   },
   {
     "revision": "194577a7e20bdcc7afbb718f502c134c",
     "url": "/ui/.DS_Store"
   },
   {
-    "revision": "b1994b4d200f6f5de9b8c7577bcc6d14",
-    "url": "/ui/right.png"
+    "revision": "4c0f1c8b54384f15e32bea691ea91acd",
+    "url": "/ui/bad.png"
+  },
+  {
+    "revision": "347329d0982682b42d40c8162817a940",
+    "url": "/ui/icons/icon-128x128.png"
   },
   {
     "revision": "32ebaab97324e0ef4b91a6136dd3ce44",

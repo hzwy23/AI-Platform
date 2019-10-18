@@ -44,10 +44,15 @@ type DeviceManageInfo struct {
 	Gateway string
 	// 设备PIN码，平台使用，设备不使用
 	Pin          string
+	
 	CreateBy     string
+
 	CreateDate   string
+
 	UpdateBy     string
+
 	UpdateDate   string
+
 	DeleteStatus uint8
 	// 总功耗
 	PowerTotal int

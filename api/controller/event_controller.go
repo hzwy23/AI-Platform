@@ -1,12 +1,13 @@
 package controller
 
 import (
-	"ai-platform/dbobj"
 	"ai-platform/api/dao"
 	"ai-platform/api/entity"
+	"ai-platform/dbobj"
 	"ai-platform/panda/hret"
 	"ai-platform/panda/route"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -43,16 +44,16 @@ func (r *EventController) Put(resp http.ResponseWriter, req *http.Request) {
 
 	if eventTypeCd == "3" {
 		// 取消灯珠异常
-		td, _ := strconv.Atoi(eventTypeCd)
+		td, _ := strconv.Atoi(Id)
 		item, err := r.dao.FindById(td)
 
 		if err != nil {
 			hret.Error(resp, 500301, "记录不存在")
 			return
 		}
+		fmt.Println("手工处理灯珠异常警告，取消灯珠异常状态", item, td)
 		dbobj.Exec("update device_manage_info set device_status = concat(substr(device_status,1,1), 1, substr(device_status,3,1)) where serial_number = ? and delete_status = 0", item.SerialNumber)
 	}
-
 
 	_, err := r.dao.CloseById(1, Id)
 	if err != nil {
@@ -62,15 +63,15 @@ func (r *EventController) Put(resp http.ResponseWriter, req *http.Request) {
 	hret.Success(resp, "Success")
 }
 
-func (r *EventController)Delete(resp http.ResponseWriter, req *http.Request) {
-	req.ParseForm();
+func (r *EventController) Delete(resp http.ResponseWriter, req *http.Request) {
+	req.ParseForm()
 	body, err := ioutil.ReadAll(req.Body)
 	if err != nil {
 		hret.Error(resp, 500030, "参数解析失败，请联系管理员")
 		return
 	}
 	var rst []entity.EventAlarmInfo
-	err = json.Unmarshal(body,&rst)
+	err = json.Unmarshal(body, &rst)
 	if err != nil {
 		hret.Error(resp, 50060, "参数格式不正确，请联系管理员")
 		return

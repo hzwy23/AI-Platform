@@ -15,7 +15,8 @@ type HomePageController struct {
 
 func (r *HomePageController) Get(resp http.ResponseWriter, req *http.Request) {
 	item := int64(0)
-	err := dbobj.QueryForObject("select sum(power_total) from device_manage_info where delete_status = 0", dbobj.PackArgs(), &item)
+	// 只统计在线，且灯珠正常的设备功耗
+	err := dbobj.QueryForObject("select sum(power_total) from device_manage_info where delete_status = 0 and substr(device_status,1,2) = '11'", dbobj.PackArgs(), &item)
 	if err != nil {
 		logger.Error(err)
 	}

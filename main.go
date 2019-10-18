@@ -12,6 +12,7 @@ import (
 func main() {
 	auth.AppRegister("api", api.Register)
 	server.AIPlatformBootstrap()
+
 	go func() {
 		for {
 			fmt.Println("*********************************************************************************************************************************")
